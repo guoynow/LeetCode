@@ -191,11 +191,46 @@ public:
 
 ### 题解
 
+>**法一：**排序+双指针。
 >
+>- 枚举每个数，表示该数$nums[i]$已被确定，在排序后的情况下，通过双指针$l$，$r$分别从左边$l = i + 1$和右边$n - 1$往中间靠拢，找到$nums[i] + nums[l] + nums[r] == 0$的所有符合条件的搭配
+>- 在找符合条件搭配的过程中，假设$sum = nums[i] + nums[l] + nums[r]$，
+>  - 若$sum > 0$，则$r$往左走，使$sum$变小；
+>  - 若$sum < 0$，则$l$往右走，使$sum$变大；
+>  - 若$sum == 0$，则表示找到了与$nums[i]$搭配的组合$nums[l]$和$nums[r]$，存到$res$中；
+>- 判重处理
+>  - 当$nums[i] == nums[i - 1]$，表示当前确定好的数与上一个一样，需要直接$continue$
+>  - 当找符合$sum == 0$时，需要对$nums[l]$和$nums[r]$进行判重
 
 ### CODE
 
 ```c++
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> all_res;
+        for (int i = 0; i < nums.size(); i ++) {
+            if (i != 0 && nums[i] == nums[i - 1]) continue; // 判重
+            
+            int l = i + 1, r = nums.size() - 1;
+            while (l < r) {
+                int sum = nums[i] + nums[l] + nums[r];
+                
+                if (sum > 0) r --;
+                else if (sum < 0) l ++;
+                else {
+                    vector<int> res = {nums[i], nums[l], nums[r]};
+                    all_res.push_back(res);
+                    // 对nums[l]和nums[r]进行判重
+                    while (l < r && nums[++ l] == nums[l - 1]);
+                    while (l < r && nums[-- r] == nums[r + 1]);
+                }
+            }
+        }
+        return all_res;
+    }
+};
 ```
 
 
@@ -245,3 +280,15 @@ public:
 
 
 # 滑动窗口
+
+## [3. 无重复字符的最长子串 - 力扣（LeetCode）](https://leetcode.cn/problems/longest-substring-without-repeating-characters/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
+
+### CODE
+
+```c++
+```
+

@@ -318,7 +318,7 @@ public:
 
 ### 题解
 
-> **法一：**双指针。
+> **法一：**双指针+哈希表。
 >
 > - 使用哈希表记录 $p$ 的每个字符个数；
 > - 使用指针 $l$ 和指针 $r$ 维护一个固定长度的滑动窗口，使用 $cnt$ 去维护窗口中有多少字符可以作为 $p$ 的异位字符，当 $cnt==p.size()$ 时，当前窗口构成的子串是 $p$ 的异位词：
@@ -421,5 +421,178 @@ public:
         return res;
     }
 };
+```
+
+
+
+## [76. 最小覆盖子串 - 力扣（LeetCode）](https://leetcode.cn/problems/minimum-window-substring/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**双指针+哈希表。
+>
+> - 思路与 $438$ 类似，需要注意的是 $76$ 的子串无需与 $t$ 等长。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> sHash, tHash;
+        for (auto it: t) tHash[it] ++;
+
+        int cnt = 0;
+        pair<int, int> res(0, s.size() + 7);
+        for (int l = 0, r = 0; r < s.size(); r ++) {
+            sHash[s[r]] ++;
+            if (sHash[s[r]] <= tHash[s[r]]) cnt ++;
+            
+            while (l <= r && sHash[s[l]] > tHash[s[l]]) sHash[s[l ++]] --;
+            
+            if (cnt == t.size() && r - l <= res.second - res.first) res = {l, r};
+        }
+        if (cnt == t.size()) return s.substr(res.first, res.second - res.first + 1);
+        else return "";
+    }
+};
+```
+
+
+
+# 五、普通数组
+
+## [53. 最大子数组和 - 力扣（LeetCode）](https://leetcode.cn/problems/maximum-subarray/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+>**法一：**递推。
+>
+>- 每次考虑以下标 $i$ 结尾的子串最大和 $pre$；
+>- 当考虑下标 $i + 1$ 时：
+>  - 若 $pre >= 0$ ，则 $i + 1$ 的子串最大和，为 $pre + nums[i + 1]$ ；
+>  - 若 $pre < 0$， 则 $i + 1$ 的子串最大和，为 $nums[i + 1]$ ；
+>- 记录全局最大和 $res$ ，即 $res = max(res, pre)$ 。
+>
+>**法二：**分治。
+>
+>- 对于一个区间 $[l, r]$，维护四个值，分别是：总和 $sum$ ；非空最大子段和 $s$ ；前缀非空最大子段和 $ls$ ；后缀非空最大
+>  子段和 $rs$ ；
+>
+>- 分别递归左右子区间并合并：
+>
+>  - 对于 $sum$ ，则是左右子区间的 $sum$ 之和；
+>  - 对于 $s$ ，则有三种情况取最大值：
+>    - 左区间的 $s$ ；
+>    - 右区间的 $s$ ；
+>    - 左区间的 $rs$ 加上右区间的 $ls$ ；
+>  - 对于 $ls$ ，则有两种情况取最大值：
+>    - 左区间的 $ls$；
+>    - 左区间的 $sum$ 加上右区间的 $ls$ ；
+>  - 对于 $rs$ 同理；
+>
+>  - 合并后返回递归的结果。
+
+### CODE
+
+```c++
+/*
+法一：递推
+*/
+class Solution { 
+public:
+    int maxSubArray(vector<int>& nums) {
+        vector<int> s(nums.size() + 7, 0);
+
+        int res = nums[0], pre = nums[0];
+        for (int i = 1; i < nums.size(); i ++) {
+            if (pre < 0) pre = 0;
+            pre += nums[i];
+            res = max(res, pre);
+        }
+
+        return res;
+    }
+};
+
+/*
+法二：分治。
+*/
+struct Node {
+    int sum, s, ls, rs;
+    Node(int sum_, int s_, int ls_, int rs_) {
+        sum = sum_; s = s_; ls = ls_; rs = rs_;
+    }
+};
+
+class Solution {
+public:
+    Node solve(int l, int r, const vector<int> &nums) {
+        if (l == r)
+            return Node(nums[l], nums[l], nums[l], nums[l]);
+
+        int mid = (l + r) >> 1;
+
+        Node left = solve(l, mid, nums);
+        Node right = solve(mid + 1, r, nums);
+
+        return Node(
+            left.sum + right.sum,
+            max(max(left.s, right.s), left.rs + right.ls),
+            max(left.ls, left.sum + right.ls),
+            max(right.rs, left.rs + right.sum)
+        );
+    }
+
+    int maxSubArray(vector<int>& nums) {
+        return solve(0, nums.size() - 1, nums).s;
+    }
+};
+```
+
+
+
+## [56. 合并区间 - 力扣（LeetCode）](https://leetcode.cn/problems/merge-intervals/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+>**法一：**排序。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+
+        int st = intervals[0][0], ed = intervals[0][1];
+        vector<vector<int>> res;
+        for (int i = 1; i < intervals.size(); i ++) {
+            int l = intervals[i][0], r = intervals[i][1];
+            
+            if (l <= ed) ed = max(ed, r);
+            else {
+                res.push_back(vector<int>{st, ed});
+                st = l, ed = r;
+            }
+        }
+        res.push_back(vector<int>{st, ed});
+        return res;
+    }
+};
+```
+
+
+
+## [189. 轮转数组 - 力扣（LeetCode）](https://leetcode.cn/problems/rotate-array/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+>
+
+### CODE
+
+```c++
 ```
 

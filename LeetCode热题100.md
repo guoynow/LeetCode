@@ -992,6 +992,66 @@ public:
 
 ### 题解
 
+> **法一：**头插法。
+>
+> **法二：**递归。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+/*
+法一：头插法。
+*/
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (!head) return head;
+
+        ListNode* L = new ListNode(); // L 是头指针
+        ListNode *p = head;
+
+        while (p) {
+            ListNode *t = p->next;
+            p->next = L->next;
+            L->next = p;
+            p = t;
+        }
+        return L->next; // L 是头指针，不是头结点，故需返回 L->next
+    }
+};
+
+/*
+法二：递归。
+*/
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (!head || !head->next) return head; // 为了防止 head 为 NULL，导致的 head->next 报错，需要先使 head != NULL
+        ListNode *tail = reverseList(head->next); // 递归
+        head->next->next = head; // 将 head 放到末尾，不要申请新结点，这样上一层的递归的 head->next 就指向了末尾（即当前head）
+        head->next = NULL;
+        return tail;
+    }
+};
+```
+
+
+
+## [234. 回文链表 - 力扣（LeetCode）](https://leetcode.cn/problems/palindrome-linked-list/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
 > 
 
 ### CODE

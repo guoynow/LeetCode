@@ -13,7 +13,10 @@
 ### CODE
 
 ```c++
-class Solution { // 法一：哈希表
+/*
+法一：哈希表。
+*/
+class Solution { 
 public:
     vector<int> twoSum(vector<int>& nums, int target)
     {
@@ -35,7 +38,10 @@ public:
     }
 };
 
-class Solution { // 法二：双指针
+/*
+法二：双指针。
+*/
+class Solution { 
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
         vector<pair<int, int>> p;
@@ -407,7 +413,7 @@ public:
 
 ### 题解
 
-> **法一：**单调队列模板题。
+> **法一：**单调队列。
 
 ### CODE
 
@@ -507,7 +513,7 @@ public:
 
 ```c++
 /*
-法一：递推
+法一：递推。
 */
 class Solution { 
 public:
@@ -672,7 +678,7 @@ public:
 };
 
 /*
-法二：前缀积、后缀积
+法二：前缀积、后缀积。
 */
 class Solution {
 public:
@@ -807,6 +813,182 @@ public:
 
 
 ## [54. 螺旋矩阵 - 力扣（LeetCode）](https://leetcode.cn/problems/spiral-matrix/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**模拟。
+>
+> - 使用  $dx[] = \{0, 1, 0, -1\}, dy[] = \{1, 0, -1, 0\}$ 模拟螺旋矩阵的四个方向，即右，下，左，上；
+> - 若按方向移动后，超出边界，或遇到已访问元素，需要更新方向；
+
+### CODE
+
+```c++
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int n = matrix.size(), m = matrix[0].size();    
+        vector<vector<bool>> st(n, vector<bool>(m, false));
+
+        int dx[] = {0, 1, 0, -1}, dy[] = {1, 0, -1, 0};
+        vector<int> res;
+        for (int i = 0, x = 0, y = 0, d = 0; i < m * n; i ++) {
+            res.push_back(matrix[x][y]);
+            st[x][y] = true;
+
+            int a = x + dx[d], b = y + dy[d];
+            if (a < 0 || a >= n || b < 0 || b >= m || st[a][b]) { // 更新方向
+                d = (d + 1) % 4;
+                a = x + dx[d], b = y + dy[d];
+            }
+            x = a, y = b;
+        }
+
+        return res;
+    }
+};
+```
+
+
+
+## [48. 旋转图像 - 力扣（LeetCode）](https://leetcode.cn/problems/rotate-image/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**翻转代替旋转。
+>
+> - 顺时针 $90°$： **主对角线**（从左上到右下）翻转，然后从**中间水平**翻转；
+> - 逆时针 $90°$： **主对角线**翻转，然后从**中间上下**翻转；
+> - 顺时针 $180°$（等价于逆时针 $180°$）：**主对角线**翻转，然后**副对角线**（从左下到右上）翻转。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+
+        for (int i = 0; i < n; i ++) {
+            for (int j = 0; j < i; j ++) {
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+
+        for (int i = 0; i < n; i ++) {
+            for (int l = 0, r = n - 1; l < r; l ++, r --) {
+                swap(matrix[i][l], matrix[i][r]);
+            }
+        }
+    }
+};
+```
+
+
+
+## [240. 搜索二维矩阵 II - 力扣（LeetCode）](https://leetcode.cn/problems/search-a-2d-matrix-ii/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**二分。
+>
+> **法二：**贪心。
+>
+> - 我们可以从矩阵 $matrix$ 的右上角 $(0,n−1)$ 进行搜索。在每一步的搜索过程中，如果我们位于位置 $(x,y)$，那么我们希望在以 $matrix$ 的左下角为左下角、以 $(x,y)$ 为右上角的矩阵中进行搜索，即行的范围为 $[x,m−1]$，列的范围为 $[0,y]$：
+> - 如果 $matrix[x,y]=target$，说明搜索完成；
+> - 如果 $matrix[x,y]>target$，由于每一列的元素都是升序排列的，那么在当前的搜索矩阵中，所有位于第 $y$ 列的元素都是严格大于 $target$ 的，因此我们可以将它们全部忽略，即将 $y$ 减少 $1$；
+> - 如果 $matrix[x,y]<target$，由于每一行的元素都是升序排列的，那么在当前的搜索矩阵中，所有位于第 $x$ 行的元素都是严格小于 $target$ 的，因此我们可以将它们全部忽略，即将 $x$ 增加 $1$。
+
+### CODE
+
+```c++
+/*
+法一：二分。
+*/
+class Solution {
+public:
+    int SL(vector<int>& arr, int i, int j, int target) {
+        int l = i - 1, r = j + 1;
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (arr[mid] < target) l = mid;
+            else r = mid;
+        }
+        return r != j + 1 && arr[r] == target ? r: -1;
+    }
+
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int n = matrix.size(), m = matrix[0].size();
+        for (int i = 0; i < n; i ++) {
+            if (SL(matrix[i], 0, m - 1, target) != -1) return true;
+        }
+        return false;
+    }
+};
+
+/*
+法二：贪心。
+*/
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int m = matrix.size(), n = matrix[0].size();
+        int x = 0, y = n - 1;
+        while (x < m && y >= 0) {
+            if (matrix[x][y] == target) return true;
+            else if (matrix[x][y] > target) y --;
+            else x ++;
+        }
+        return false;
+    }
+};
+```
+
+
+
+## [160. 相交链表 - 力扣（LeetCode）](https://leetcode.cn/problems/intersection-of-two-linked-lists/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**指针扫描。
+>
+> <img src="./LeetCode热题100.assets/image-20251015184800284.png" alt="image-20251015184800284" align="left" style="zoom: 80%;" />
+>
+> **法二：**先分别遍历两个链表，求两个链表的长度，让长度较长的链表先走完这个**长度差**，然后两个链表一起移动第一次相等就是答案。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+/*
+法一：指针扫描。
+*/
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        ListNode *p = headA, *q = headB; // 用两个指针分别从两个链表头部开始扫描，每次分别走一步；
+        while (p != q) {
+            if (p) p = p->next; 
+            else p = headB; // 如果指针走到 null，则从另一个链表头部开始走
+            if (q) q = q->next; 
+            else q = headA; // 如果指针走到 null，则从另一个链表头部开始走
+        }
+        return p;
+    }
+};
+```
+
+
+
+## [206. 反转链表 - 力扣（LeetCode）](https://leetcode.cn/problems/reverse-linked-list/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
 

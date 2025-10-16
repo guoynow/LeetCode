@@ -1374,7 +1374,7 @@ public:
 class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
-        ListNode *L = new ListNode(0, head);
+        ListNode *L = new ListNode(0, head); // 头指针
         ListNode *fast = L, *slow = L;
         
         while (n --) fast = fast->next; // 快指针先走 n 步，然后快、慢指针一起走
@@ -1393,6 +1393,103 @@ public:
 
 
 ## [24. 两两交换链表中的节点 - 力扣（LeetCode）](https://leetcode.cn/problems/swap-nodes-in-pairs/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**模拟。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        ListNode *L = new ListNode(0, head); // 头指针
+
+        ListNode *p = L;
+        while (p->next && p->next->next) {
+            ListNode *l = p->next;
+            ListNode *r = l->next;
+            ListNode *t = r->next;
+
+            p->next = r;
+            r->next = l;
+            l->next = t;
+            p = l;
+        }
+        return L->next;
+    }
+};
+```
+
+
+
+## [25. K 个一组翻转链表 - 力扣（LeetCode）](https://leetcode.cn/problems/reverse-nodes-in-k-group/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+>  **法一：**头插法翻转。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseList(ListNode* &L, int k) {
+        ListNode *p = L->next;
+        ListNode *q = L->next; // q 是初始链表的头结点，也是翻转后的尾结点，也是下一段链表的头指针
+        while (p && k --) {
+            ListNode *t = p->next;
+            p->next = L->next;
+            L->next = p;
+            p = t;
+        }
+        if (q) q->next = p; // 最后一个 p 结点是下一段链表的头结点，将其接在 q 结点之后
+        return q;
+    }
+
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode *L = new ListNode(0, head); // 头指针
+        
+       
+        int n = 0;
+        for (ListNode *p = L->next; p; p = p->next, n ++) ;  // 计算链表长度
+        
+        int cnt = n / k; // 计算总翻转次数
+        
+        ListNode *q = L;
+        while (q && cnt --) {
+            q = reverseList(q, k);
+        }
+        
+        return L->next;
+    }
+};
+```
+
+
+
+## [138. 随机链表的复制 - 力扣（LeetCode）](https://leetcode.cn/problems/copy-list-with-random-pointer/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
 

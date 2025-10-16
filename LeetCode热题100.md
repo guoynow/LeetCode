@@ -946,6 +946,8 @@ public:
 
 
 
+# 七、链表
+
 ## [160. 相交链表 - 力扣（LeetCode）](https://leetcode.cn/problems/intersection-of-two-linked-lists/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
@@ -1049,6 +1051,348 @@ public:
 
 
 ## [234. 回文链表 - 力扣（LeetCode）](https://leetcode.cn/problems/palindrome-linked-list/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**将链表分为头链表（$head$）和尾链表（$tail$）两部分，将尾链表反转，然后从 $head$ 和 $tail$ 开始比较。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        int cnt = 0;
+        for (ListNode *p = head; p; p = p->next, cnt ++) ; // 计算链表总长度
+        if (cnt == 1) return true;
+        
+        // 获得尾链表的头指针（即头链表的最后一个结点）
+        ListNode *tailPtr = head;
+        for (int i = 0; i < (cnt + 1) / 2 - 1; tailPtr = tailPtr->next, i ++) ; 
+
+        ListNode *p = tailPtr->next; // 保存尾链表的头结点
+        tailPtr->next = NULL; // 初始化尾链表的头指针，使最后一个结点 next 指向 NULL
+        while (p) { // 头插法反转
+            ListNode *t = p->next;
+            p->next = tailPtr->next;
+            tailPtr->next = p;
+            p = t;
+        }
+
+        ListNode *tail = tailPtr->next; // 访问尾链表的第一个元素，即头结点
+        while (tail) {
+            if (head->val != tail->val) return false;
+            head = head->next;
+            tail = tail->next;
+        }
+        return true;
+    }
+};
+```
+
+
+
+## [141. 环形链表 - 力扣（LeetCode）](https://leetcode.cn/problems/linked-list-cycle/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**双指针。
+>
+> - 用快、慢指针从头开始扫描，慢指针每次走一步，快指针每次走两步。如果走到 $null$，说明不存在环；否则如果两个指针相遇，则说明存在环。
+>
+> - 假设链表存在环，则当慢指针走到环入口时，快指针已经走到环上的某个位置，距离环入口还差 $x$ 步。由于快指针每次比慢指针多走一步，所以慢指针再走 $x$ 步，两个指针就相遇了。
+>
+> **法二：**哈希表。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+/*
+法一：双指针。
+*/
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        if (!head) return false;
+        ListNode *fast = head, *slow = head;
+
+        while (fast->next && fast->next->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+            if (fast == slow) return true;
+        }
+        return false;
+    }
+};
+
+/*
+法二：哈希表。
+*/
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        unordered_map<ListNode*, int> hash;
+        while (head) {
+            if (hash.count(head)) return true;
+            hash[head] ++;
+            head = head->next;
+        }
+        return false;
+    }
+};
+```
+
+
+
+## [142. 环形链表 II - 力扣（LeetCode）](https://leetcode.cn/problems/linked-list-cycle-ii/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+>**法一：**双指针。
+>
+><img src="./LeetCode热题100.assets/image-20251016164355318.png" alt="image-20251016164355318" align="left" style="zoom: 50%;" />
+>
+>- 使用快、慢指针，快指针每次走两步，慢指针每次走一步，当两个指针**第一次相遇**的时候，将**慢指针返回起始点**，然后快、慢指针**每次走一格**，**再次相遇**就是环的**入口节点**。
+>- 证明：
+>  - 假设 $A$ 是链表起点，$B$ 是链表环的入口，$C$ 是第一次相遇的地方。$AB、BC、CB$ 的距离分别是 $x、y、z$，那么环的长度为 $y+z$。
+>  - 快、慢指针第一次相遇时分别走过的距离为：$fast = x + y + k(y + z), ~slow=x+y$。
+>  - 因为快指针走的距离是慢指针的两倍，得：$x = k(y + z) - y$。
+>  - 故慢指针从 $A$ 出发，快指针从 $C$ 出发，此时快、慢指针每次走一步，经过 $x$ 步在 $B$ 相遇，即环入口。
+>
+>**法二：**哈希表。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+/*
+法一：双指针。
+*/
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if (!head) return NULL;
+        ListNode *fast = head, *slow = head;
+
+        bool isCycle = false;
+        while (fast->next && fast->next->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+            if (fast == slow) {
+                slow = head;
+                isCycle = true;
+                break;
+            }
+        }
+
+        if (!isCycle) return NULL;
+        
+        while (slow != fast) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return fast;
+    }
+};
+
+/*
+法二：哈希表。
+*/
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        unordered_map<ListNode*, int> hash;
+        while (head) {
+            if (hash.count(head)) return head;
+            hash[head] ++;
+            head = head->next;
+        }
+        return NULL;
+    }
+};
+```
+
+
+
+## [21. 合并两个有序链表 - 力扣（LeetCode）](https://leetcode.cn/problems/merge-two-sorted-lists/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 法一：指针扫描。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    void tailInsert(ListNode* &r, ListNode* &s) {
+        ListNode *t = s->next;
+        s->next = r->next;
+        r->next = s;
+        r = s; // 尾结点后移
+        s = t;
+    }
+
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode *L = new ListNode();
+        ListNode *r = L;
+        while (list1 && list2) {
+            if (list1->val <= list2->val) {
+                tailInsert(r, list1);
+            }
+            else {
+                tailInsert(r, list2);
+            }
+        }
+        while (list1) tailInsert(r, list1);
+        while (list2) tailInsert(r, list2);
+        return L->next;
+    }
+};
+```
+
+
+
+## [2. 两数相加 - 力扣（LeetCode）](https://leetcode.cn/problems/add-two-numbers/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**模拟。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    void add(ListNode* &r, ListNode* &l1, ListNode* &l2, int &cin) {
+        int x = l1->val + l2->val + cin;
+        cin = x / 10;
+        x %= 10;
+
+        ListNode *s = new ListNode(x);
+        r->next = s;
+        r = s;
+
+        l1 = l1->next;
+        l2 = l2->next;
+    }
+
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode *L = new ListNode();
+        ListNode *r = L;
+        
+        int cin = 0; // 进位
+        while (l1 && l2) {
+            add(r, l1, l2, cin);
+        }
+        while (l1) {
+            ListNode *zero = new ListNode();
+            add(r, l1, zero, cin);
+        }
+        while (l2) {
+            ListNode *zero = new ListNode();
+            add(r, zero, l2, cin);
+        }
+        if (cin) r->next = new ListNode(cin); // 处理最后一位进位
+        
+        return L->next;
+    }
+};
+```
+
+
+
+
+
+## [19.删除链表的倒数第N个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**快、慢双指针。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode *L = new ListNode(0, head);
+        ListNode *fast = L, *slow = L;
+        
+        while (n --) fast = fast->next; // 快指针先走 n 步，然后快、慢指针一起走
+
+        while (fast->next) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        slow->next = slow->next->next;
+        
+        return L->next;
+    }
+};
+```
+
+
+
+## [24. 两两交换链表中的节点 - 力扣（LeetCode）](https://leetcode.cn/problems/swap-nodes-in-pairs/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
 

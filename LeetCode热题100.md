@@ -1592,13 +1592,12 @@ public:
         s = t;
     }
 
-    ListNode* mergeLists(ListNode* &L, ListNode* &l1, ListNode* &l2, ListNode* &nextMergePtr, int k) {
-        // ListNode *L = new ListNode(-1, nextPtrMerge);
-        L->next = nextMergePtr;
+    ListNode* mergeTwoLists(ListNode* &L, ListNode* &l1, ListNode* &l2, ListNode* &nextMergeHead, int k) {
+        L->next = nextMergeHead; // 因为是迭代归并，故链表应以，下一个归并区间 L1 的头结点，作为结束标志，而不是 NULL
         ListNode *r = L;
-        int i = k, j = k;
+        int i = k, j = k; // L1、L2 最长为 K
 
-        while (i && j && l1 && l2) {
+        while (i && j && l1 && l2) { 
             if (l1->val <= l2->val) {
                 tailInsert(r, l1);
                 i --;
@@ -1613,7 +1612,7 @@ public:
         while (j -- && l2) tailInsert(r, l2);
 
         ListNode *newHead = L->next;
-        L = r;
+        L = r; // 尾结点正好是下一个归并区间 L1 的头指针
 
         return newHead;
     }
@@ -1622,23 +1621,22 @@ public:
         if (!head) return NULL;
 
         int n = 0;
-        for (ListNode *p = head; p; p = p->next, n ++) ;
+        for (ListNode *p = head; p; p = p->next, n ++) ; // 总长度
 
-        for (int i = 1; i < n; i *= 2) {
-            // ListNode *p = head;
-            ListNode *nextMergePtr = head;
-            ListNode *L = new ListNode();
+        for (int i = 1; i < n; i *= 2) { // 归并区间中链表 L1、L2 的长度，初始长度为 1 
+            ListNode *nextMergeHead = head; // 下一个归并区间 L1 的头结点
+            ListNode *L = new ListNode(); // L1 的头指针
+            
             for (int j = 0; j < n; j += i * 2) {
+                ListNode *p = nextMergeHead; // L1 的头结点
                 
-                ListNode *p = nextMergePtr; // L1 的头结点
                 ListNode *q = p; // L2 的头结点
-
                 for (int k = 0; k < i && q; k ++, q = q->next) ;
 
-                nextMergePtr = q;
-                for (int k = 0; k < i && nextMergePtr; k ++, nextMergePtr = nextMergePtr->next) ;
+                nextMergeHead = q; // 下一个归并区间 L1 的头结点
+                for (int k = 0; k < i && nextMergeHead; k ++, nextMergeHead = nextMergeHead->next) ;
 
-                ListNode *newHead = mergeLists(L, p, q, nextMergePtr, i);
+                ListNode *newHead = mergeTwoLists(L, p, q, nextMergeHead, i); // 归并 L1、L2
 
                 if (j == 0) head = newHead;
             }
@@ -1704,6 +1702,69 @@ public:
 
 
 ## [23. 合并 K 个升序链表 - 力扣（LeetCode）](https://leetcode.cn/problems/merge-k-sorted-lists/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**归并思想。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        if (lists.size() == 0) return NULL;
+        if (lists.size() == 1) return lists[0];
+
+        int mid = lists.size() / 2;
+
+        vector<ListNode*> left = vector<ListNode*> (lists.begin(), lists.begin() + mid);
+        vector<ListNode*> right = vector<ListNode*> (lists.begin() + mid, lists.end());
+
+        ListNode *l1 = mergeKLists(left);
+        ListNode *l2 = mergeKLists(right);
+
+        return mergeTwoLists(l1, l2);
+    }
+
+    void tailInsert(ListNode* &r, ListNode* &s) {
+        ListNode *t = s->next;
+        s->next = r->next;
+        r->next = s;
+        r = s; // 尾结点后移
+        s = t;
+    }
+
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode *L = new ListNode();
+        ListNode *r = L;
+        while (list1 && list2) {
+            if (list1->val <= list2->val) {
+                tailInsert(r, list1);
+            }
+            else {
+                tailInsert(r, list2);
+            }
+        }
+        r->next = list1? list1: list2;
+        return L->next;
+    }
+};
+```
+
+
+
+## [146. LRU 缓存 - 力扣（LeetCode）](https://leetcode.cn/problems/lru-cache/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
 

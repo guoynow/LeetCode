@@ -1282,8 +1282,7 @@ public:
                 tailInsert(r, list2);
             }
         }
-        while (list1) tailInsert(r, list1);
-        while (list2) tailInsert(r, list2);
+        r->next = list1? list1: list2;
         return L->next;
     }
 };
@@ -1471,7 +1470,6 @@ public:
     ListNode* reverseKGroup(ListNode* head, int k) {
         ListNode *L = new ListNode(0, head); // 头指针
         
-       
         int n = 0;
         for (ListNode *p = L->next; p; p = p->next, n ++) ;  // 计算链表长度
         
@@ -1490,6 +1488,222 @@ public:
 
 
 ## [138. 随机链表的复制 - 力扣（LeetCode）](https://leetcode.cn/problems/copy-list-with-random-pointer/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> - 遍历链表，在每一个原结点后，复制一个相同的结点（不复制 $random$ 指针）；
+> - 遍历链表，给复制的新结点添加 $random$ 指针（即原结点 $random$ 指针的 $next$，注意 $random$ 是否为 $NULL$）；
+> - 分割出原链表和新链表。
+
+### CODE
+
+```c++
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if (!head) return NULL;
+
+        Node *p = head;
+        while (p) { // 为每个结点复制一个相同的结点
+            Node *s = new Node(p->val, p->next, NULL);
+            s->next = p->next;
+            p->next = s;
+            p = s->next;
+        }
+
+        p = head;
+        while (p && p->next) {
+            Node *copy = p->next; // 为新结点添加 random 指针
+            if (p->random) copy->random = p->random->next;
+            p = p->next->next;
+        }
+
+        Node *L = new Node(0);
+        Node *r = L;
+        p = head;
+        while (p && p->next) {
+            Node *copy = p->next;
+            Node *t = copy->next;
+            
+            // 提取新链表
+            copy->next = r->next;
+            r->next = copy;
+            
+            r = copy; // 恢复尾结点
+            
+            p->next = t; // 提取原链表
+            
+            p = t; // 恢复下一个工作指针
+        }
+        
+        return L->next;
+    }
+};
+```
+
+
+
+## [148. 排序链表 - 力扣（LeetCode）](https://leetcode.cn/problems/sort-list/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**归并排序。
+
+### CODE
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+/*
+O(1)空间复杂度：迭代法。
+*/
+class Solution {
+public:
+    void tailInsert(ListNode* &r, ListNode* &s) {
+        ListNode *t = s->next;
+        s->next = r->next;
+        r->next = s;
+        r = s;
+        s = t;
+    }
+
+    ListNode* mergeLists(ListNode* &L, ListNode* &l1, ListNode* &l2, ListNode* &nextMergePtr, int k) {
+        // ListNode *L = new ListNode(-1, nextPtrMerge);
+        L->next = nextMergePtr;
+        ListNode *r = L;
+        int i = k, j = k;
+
+        while (i && j && l1 && l2) {
+            if (l1->val <= l2->val) {
+                tailInsert(r, l1);
+                i --;
+            }
+            else {
+                tailInsert(r, l2);
+                j --;
+            }
+        }
+        
+        while (i -- && l1) tailInsert(r, l1);
+        while (j -- && l2) tailInsert(r, l2);
+
+        ListNode *newHead = L->next;
+        L = r;
+
+        return newHead;
+    }
+
+    ListNode* sortList(ListNode* head) {
+        if (!head) return NULL;
+
+        int n = 0;
+        for (ListNode *p = head; p; p = p->next, n ++) ;
+
+        for (int i = 1; i < n; i *= 2) {
+            // ListNode *p = head;
+            ListNode *nextMergePtr = head;
+            ListNode *L = new ListNode();
+            for (int j = 0; j < n; j += i * 2) {
+                
+                ListNode *p = nextMergePtr; // L1 的头结点
+                ListNode *q = p; // L2 的头结点
+
+                for (int k = 0; k < i && q; k ++, q = q->next) ;
+
+                nextMergePtr = q;
+                for (int k = 0; k < i && nextMergePtr; k ++, nextMergePtr = nextMergePtr->next) ;
+
+                ListNode *newHead = mergeLists(L, p, q, nextMergePtr, i);
+
+                if (j == 0) head = newHead;
+            }
+        }
+
+        return head;
+    }
+};
+
+/*
+O(logn)空间复杂度：递归法。
+*/
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        // corner case
+        if(!head || !head->next) return head;
+
+        // 找中间节点
+        ListNode* fast = head;
+        ListNode* slow = head;
+        while(fast->next && fast->next->next){
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+
+        // slow指向中间节点，现在需要把前后段分开
+        fast = slow;
+        slow = slow->next;
+        fast->next = NULL;
+
+        ListNode* left = sortList(head);
+        ListNode* right = sortList(slow);
+
+        return mergeTwoLists(left,right);
+    }
+
+    void tailInsert(ListNode* &r, ListNode* &s) {
+        ListNode *t = s->next;
+        s->next = r->next;
+        r->next = s;
+        r = s; // 尾结点后移
+        s = t;
+    }
+
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode *L = new ListNode();
+        ListNode *r = L;
+        while (list1 && list2) {
+            if (list1->val <= list2->val) {
+                tailInsert(r, list1);
+            }
+            else {
+                tailInsert(r, list2);
+            }
+        }
+        r->next = list1? list1: list2;
+        return L->next;
+    }
+};
+```
+
+
+
+## [23. 合并 K 个升序链表 - 力扣（LeetCode）](https://leetcode.cn/problems/merge-k-sorted-lists/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
 

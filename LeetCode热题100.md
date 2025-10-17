@@ -1274,6 +1274,7 @@ public:
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
         ListNode *L = new ListNode();
         ListNode *r = L;
+        
         while (list1 && list2) {
             if (list1->val <= list2->val) {
                 tailInsert(r, list1);
@@ -1282,7 +1283,10 @@ public:
                 tailInsert(r, list2);
             }
         }
-        r->next = list1? list1: list2;
+        
+        while (list1) tailInsert(r, list1);
+        while (list2) tailInsert(r, list2);
+        
         return L->next;
     }
 };
@@ -1685,6 +1689,7 @@ public:
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
         ListNode *L = new ListNode();
         ListNode *r = L;
+        
         while (list1 && list2) {
             if (list1->val <= list2->val) {
                 tailInsert(r, list1);
@@ -1693,7 +1698,10 @@ public:
                 tailInsert(r, list2);
             }
         }
-        r->next = list1? list1: list2;
+        
+        while (list1) tailInsert(r, list1);
+        while (list2) tailInsert(r, list2);
+        
         return L->next;
     }
 };
@@ -1748,6 +1756,7 @@ public:
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
         ListNode *L = new ListNode();
         ListNode *r = L;
+        
         while (list1 && list2) {
             if (list1->val <= list2->val) {
                 tailInsert(r, list1);
@@ -1756,7 +1765,10 @@ public:
                 tailInsert(r, list2);
             }
         }
-        r->next = list1? list1: list2;
+        
+       	while (list1) tailInsert(r, list1);
+        while (list2) tailInsert(r, list2);
+        
         return L->next;
     }
 };

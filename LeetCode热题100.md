@@ -1935,14 +1935,13 @@ public:
                 stk.push(p);
                 p = p->left;
             }
-            if (!stk.empty()) {   // 每次取出栈顶，访问它，再访问其右子树
-                p = stk.top();
-                stk.pop();
-                
-                res.push_back(p->val); // 中序遍历
-                
-                p = p->right;
-            }
+
+            p = stk.top();
+            stk.pop();
+            
+            res.push_back(p->val); // 中序遍历
+            
+            p = p->right;
         }
         
         return res;
@@ -2129,7 +2128,7 @@ public:
 };
 
 /*
-法二：迭代。
+法二：中序遍历（左根右，右根左）迭代。
 */
 class Solution {
 public:
@@ -2146,15 +2145,13 @@ public:
             }
             if (l || r) return false;
 
-            if (!stkL.empty() && !stkR.empty()) {
-                l = stkL.top(), r = stkR.top();
-                stkL.pop(), stkR.pop();
+            l = stkL.top(), r = stkR.top();
+            stkL.pop(), stkR.pop();
 
-                if (l->val != r->val) return false;
+            if (l->val != r->val) return false;
 
-                l = l->right;
-                r = r->left; 
-            }
+            l = l->right;
+            r = r->left; 
         }
 
         return true;

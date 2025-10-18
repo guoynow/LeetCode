@@ -1879,7 +1879,7 @@ public:
 
 ### 题解
 
-> **法一：**递归。
+> **法一：**$DFS$ 递归。
 >
 > **法二：**迭代。
 
@@ -1948,5 +1948,230 @@ public:
         return res;
     }
 };
+```
+
+
+
+## [104. 二叉树的最大深度 - 力扣（LeetCode）](https://leetcode.cn/problems/maximum-depth-of-binary-tree/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DFS$ 递归。
+>
+> **法二：**$BFS$ 层序遍历。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+/*
+法一：DFS 递归。
+*/
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if (!root) return 0;
+
+        return max(maxDepth(root->left), maxDepth(root->right)) + 1;
+    }
+
+};
+
+/*
+法二：BFS 层序遍历。
+*/
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if (!root) return 0;
+
+        queue<TreeNode*> Q;
+        Q.push(root);
+
+        int res = 0;
+        while (!Q.empty()) {
+            int layer = Q.size(); // 每一层的结点个数
+            while (layer --) {
+                TreeNode *p = Q.front();
+                Q.pop();
+                if (p->left) Q.push(p->left);
+                if (p->right) Q.push(p->right);
+            }
+            res ++;
+        }
+
+        return res;
+    }
+};
+```
+
+
+
+## [226. 翻转二叉树 - 力扣（LeetCode）](https://leetcode.cn/problems/invert-binary-tree/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DFS$ 递归。
+>
+> **法二：**$BFS$ 层序遍历。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+/*
+法一：DFS 递归。
+*/
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if (!root) return NULL;
+
+        TreeNode* left = invertTree(root->left);
+        TreeNode* right = invertTree(root->right);
+
+        root->left = right;
+        root->right = left;
+
+        return root;
+    }
+};
+
+/*
+法二：BFS 层序遍历。
+*/
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if (!root) return root;
+
+        queue<TreeNode*> Q;
+        Q.push(root);
+
+        while (!Q.empty()) {
+            TreeNode *p = Q.front();
+            Q.pop();
+
+            if (p->left) Q.push(p->left);
+            if (p->right) Q.push(p->right);
+
+            TreeNode *t = p->left;
+            p->left = p->right;
+            p->right = t;
+        }
+
+        return root;
+    }
+};
+```
+
+
+
+## [101. 对称二叉树 - 力扣（LeetCode）](https://leetcode.cn/problems/symmetric-tree/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DFS$ 递归。
+>
+> **法二：**中序遍历（左根右，右根左）迭代。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+/*
+法一：DFS 递归。
+*/
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) {
+        if (!root) return true;
+        return dfs(root->left, root->right);
+    }
+
+    bool dfs(TreeNode* l, TreeNode* r) {
+        if (!l || !r) return !l && !r;
+        return l->val == r->val && dfs(l->left, r->right) && dfs(l->right, r->left); 
+    }
+};
+
+/*
+法二：迭代。
+*/
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) {
+        if (!root) return true;
+
+        stack<TreeNode*> stkL, stkR;
+        TreeNode *l = root->left, *r = root->right;
+        
+        while (l || r || !stkL.empty() || !stkR.empty()) {
+            while (l && r) {
+                stkL.push(l), stkR.push(r);
+                l = l->left, r = r->right;
+            }
+            if (l || r) return false;
+
+            if (!stkL.empty() && !stkR.empty()) {
+                l = stkL.top(), r = stkR.top();
+                stkL.pop(), stkR.pop();
+
+                if (l->val != r->val) return false;
+
+                l = l->right;
+                r = r->left; 
+            }
+        }
+
+        return true;
+    }
+};
+```
+
+
+
+## [543. 二叉树的直径 - 力扣（LeetCode）](https://leetcode.cn/problems/diameter-of-binary-tree/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
+
+### CODE
+
+``` c++
 ```
 

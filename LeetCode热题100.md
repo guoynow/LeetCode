@@ -1567,7 +1567,9 @@ public:
 
 ### 题解
 
-> **法一：**归并排序。
+> **法一：**归并排序递归法，$O(logn)$ 空间复杂度。
+>
+> **法二：**归并排序迭代法，$O(1)$ 空间复杂度。
 
 ### CODE
 
@@ -1584,7 +1586,63 @@ public:
  */
 
 /*
-O(1)空间复杂度：迭代法。
+法一：递归。
+*/
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        // corner case
+        if(!head || !head->next) return head;
+
+        // 找中间节点
+        ListNode* fast = head;
+        ListNode* slow = head;
+        while(fast->next && fast->next->next){
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+
+        // slow指向中间节点，现在需要把前后段分开
+        fast = slow;
+        slow = slow->next;
+        fast->next = NULL;
+
+        ListNode* left = sortList(head);
+        ListNode* right = sortList(slow);
+
+        return mergeTwoLists(left,right);
+    }
+
+    void tailInsert(ListNode* &r, ListNode* &s) {
+        ListNode *t = s->next;
+        s->next = r->next;
+        r->next = s;
+        r = s; // 尾结点后移
+        s = t;
+    }
+
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode *L = new ListNode();
+        ListNode *r = L;
+        
+        while (list1 && list2) {
+            if (list1->val <= list2->val) {
+                tailInsert(r, list1);
+            }
+            else {
+                tailInsert(r, list2);
+            }
+        }
+        
+        while (list1) tailInsert(r, list1);
+        while (list2) tailInsert(r, list2);
+        
+        return L->next;
+    }
+};
+
+/*
+法二：迭代。
 */
 class Solution {
 public:
@@ -1647,62 +1705,6 @@ public:
         }
 
         return head;
-    }
-};
-
-/*
-O(logn)空间复杂度：递归法。
-*/
-class Solution {
-public:
-    ListNode* sortList(ListNode* head) {
-        // corner case
-        if(!head || !head->next) return head;
-
-        // 找中间节点
-        ListNode* fast = head;
-        ListNode* slow = head;
-        while(fast->next && fast->next->next){
-            fast = fast->next->next;
-            slow = slow->next;
-        }
-
-        // slow指向中间节点，现在需要把前后段分开
-        fast = slow;
-        slow = slow->next;
-        fast->next = NULL;
-
-        ListNode* left = sortList(head);
-        ListNode* right = sortList(slow);
-
-        return mergeTwoLists(left,right);
-    }
-
-    void tailInsert(ListNode* &r, ListNode* &s) {
-        ListNode *t = s->next;
-        s->next = r->next;
-        r->next = s;
-        r = s; // 尾结点后移
-        s = t;
-    }
-
-    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
-        ListNode *L = new ListNode();
-        ListNode *r = L;
-        
-        while (list1 && list2) {
-            if (list1->val <= list2->val) {
-                tailInsert(r, list1);
-            }
-            else {
-                tailInsert(r, list2);
-            }
-        }
-        
-        while (list1) tailInsert(r, list1);
-        while (list2) tailInsert(r, list2);
-        
-        return L->next;
     }
 };
 ```
@@ -1780,10 +1782,171 @@ public:
 
 ### 题解
 
-> 
+> **法一：**哈希表+双链表。
+>
+> - 用 `unordered_map<int, Node*>` 存储 $key$ 到**存储结点**的映射，即可 $O(1)$ 查询对应结点的位置；
+> - 用双链表存储当前的 $LRUCache$，**每次访问**结点 $node$，将其**删除**，然后**插入到链表尾部**。经过这样的操作，**头结点**就是**最久未使用**的结点。
 
 ### CODE
 
 ```c++
+class Node {
+public:
+    int k, v;
+    Node *prev, *next;
+
+    Node (int k_, int v_) {
+        k = k_, v = v_;
+        prev = next = NULL;
+    }
+};
+
+class LRUCache {
+public:
+    int tot, c;
+    Node *Lh, *Lr; // 头、尾指针
+    unordered_map<int, Node*> hash;
+
+    LRUCache(int capacity) {
+        tot = 0, c = capacity;
+        Lh = new Node(-1, -1), Lr = new Node(-1, -1); // 头、尾指针
+        Lh->next = Lr, Lr->prev = Lh;
+    }
+    
+    int get(int key) {
+        if (!hash.count(key)) return -1;
+        
+        Node *node = hash[key];
+        
+        removeNode(node); // 每访问一次结点 node，将其删除
+        tailInsert(node); // 然后插入到链表尾部
+        
+        return node->v;
+    }
+    
+    void put(int key, int value) {
+        if (!hash.count(key)) { // 链表中不存在该 key
+            if (tot == c) {
+                Node *node = Lh->next;
+                
+                // 删除最久未使用的结点，即头结点
+                removeNode(node); 
+                hash.erase(node->k);
+                delete(node);
+                tot --; 
+            }
+            // 新增一个结点
+            Node *node = new Node(key, value);
+            tailInsert(node); 
+            hash[key] = node;
+            tot ++;
+        }
+        else { // 链表中存在该 key
+            Node *node = hash[key];
+            node->v = value;
+            
+            removeNode(node); // 每访问一次结点 node，将其删除
+            tailInsert(node); // 然后插入到链表尾部
+        }
+    }
+
+    void removeNode(Node* &node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+
+    void tailInsert(Node* &node) {
+        node->next = Lr;
+        node->prev = Lr->prev;
+        Lr->prev->next = node;
+        Lr->prev = node; 
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+```
+
+
+
+# 八、二叉树
+
+## [94. 二叉树的中序遍历 - 力扣（LeetCode）](https://leetcode.cn/problems/binary-tree-inorder-traversal/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**递归。
+>
+> **法二：**迭代。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+/*
+法一：递归。
+*/
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        if (!root) return vector<int>(0); // 返回空数组
+
+        vector<int> left = inorderTraversal(root->left);
+        
+        vector<int> mid = {root->val}; // 中序遍历
+        
+        vector<int> right = inorderTraversal(root->right);
+        
+        // 合并答案
+        left.insert(left.end(), mid.begin(), mid.end());
+        left.insert(left.end(), right.begin(), right.end());
+        
+        return left;
+    }
+};
+
+/*
+法二：迭代。
+*/
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        stack<TreeNode*> stk;
+        TreeNode* p = root;
+        
+        while (p || !stk.empty()) {
+            while (p) {   // 一直向左并将沿途结点压入堆栈
+                stk.push(p);
+                p = p->left;
+            }
+            if (!stk.empty()) {   // 每次取出栈顶，访问它，再访问其右子树
+                p = stk.top();
+                stk.pop();
+                
+                res.push_back(p->val); // 中序遍历
+                
+                p = p->right;
+            }
+        }
+        
+        return res;
+    }
+};
 ```
 

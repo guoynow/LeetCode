@@ -1882,7 +1882,7 @@ public:
 
 ### 题解
 
-> **法一：**$DFS$ 递归。
+> **法一：**递归。
 >
 > **法二：**迭代。
 
@@ -1958,7 +1958,7 @@ public:
 
 ### 题解
 
-> **法一：**$DFS$ 递归。
+> **法一：**$DFS$ 。
 >
 > **法二：**$BFS$ 层序遍历。
 
@@ -1978,7 +1978,7 @@ public:
  */
 
 /*
-法一：DFS 递归。
+法一：DFS。
 */
 class Solution {
 public:
@@ -2024,7 +2024,7 @@ public:
 
 ### 题解
 
-> **法一：**$DFS$ 递归。
+> **法一：**$DFS$ 。
 >
 > **法二：**$BFS$ 层序遍历。
 
@@ -2044,7 +2044,7 @@ public:
  */
 
 /*
-法一：DFS 递归。
+法一：DFS。
 */
 class Solution {
 public:
@@ -2095,7 +2095,7 @@ public:
 
 ### 题解
 
-> **法一：**$DFS$ 递归。
+> **法一：**$DFS$ 。
 >
 > **法二：**中序遍历（左根右，右根左）迭代。
 
@@ -2115,7 +2115,7 @@ public:
  */
 
 /*
-法一：DFS 递归。
+法一：DFS。
 */
 class Solution {
 public:
@@ -2312,7 +2312,158 @@ public:
 
 ### 题解
 
-> 
+> **法一：**递归地检查每个结点的值是否超过上、下限。
+>
+> **法二：**$DFS$ 中序遍历。
+>
+> **法三：**迭代中序遍历。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+/*
+法一：递归地检查每个结点的值是否超过上、下限。
+*/
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        if (!root) return true;
+        return dfs(root, (long long)INT_MIN - 7, (long long)INT_MAX + 7); 
+    }
+
+    bool dfs(TreeNode* root, long long MIN, long long MAX) {
+        if (!root) return true;
+        if (root->val >= MAX || root->val <= MIN) return false;
+        return dfs(root->left, MIN, root->val) && dfs(root->right, root->val, MAX);
+    }
+};
+
+/*
+法二：DFS 中序遍历。
+*/
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        if (!root) return true;
+
+        bool res = true;
+        TreeNode *prev = NULL;
+        dfs(root, res, prev);
+
+        return res;
+    }
+
+    void dfs(TreeNode* &root, bool &res, TreeNode* &prev) {
+        if (!root) return;
+
+        dfs(root->left, res, prev);
+        
+        if (prev && prev->val >= root->val) {
+            res = false;
+            return;
+        }
+        prev = root;
+        
+        dfs(root->right, res, prev);
+    }
+};
+
+/*
+法三：迭代中序遍历。
+*/
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        if (!root) return true;
+
+        TreeNode *p = root, *prev = NULL;
+        stack<TreeNode*> stk;
+
+        while (p || !stk.empty()) {
+            while (p) {
+                stk.push(p);
+                p = p->left;
+            }
+
+            p = stk.top();
+            stk.pop();
+
+            if (prev && prev->val >= p->val) return false;
+            prev = p;
+            
+            p = p->right;
+        }
+
+        return true;
+    }
+};
+```
+
+
+
+## [230. 二叉搜索树中第 K 小的元素 - 力扣（LeetCode）](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DFS$ 中序遍历。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        int res = 0;
+        dfs(root, res, k);
+
+        return res;
+    }
+
+    void dfs(TreeNode* &root, int &res, int &k) {
+        if (!root) return;
+        if (!k) return;
+        dfs(root->left, res, k);
+
+        k --;
+        if (!k) res = root->val;
+
+        dfs(root->right, res, k);
+    }
+};
+```
+
+
+
+## [199. 二叉树的右视图 - 力扣（LeetCode）](https://leetcode.cn/problems/binary-tree-right-side-view/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**层序遍历。
+>
+> - 层序遍历的变种，每层**从右向左**访问，返回每层的第一个节点（即最右的节点）。
 
 ### CODE
 

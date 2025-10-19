@@ -187,7 +187,11 @@ public:
         {
             int h = min(height[l], height[r]);
             res = max(res, h * (r - l));
-            while (l < r && height[l] <= h) l ++;
+            
+            // 若 height[l] > h 则 l 不会更新；
+            // 若 height[r] > h 则 r 不会更新；
+            // 若 height[l] == height[r]，则 l、r 同时更新；
+            while (l < r && height[l] <= h) l ++; 
             while (l < r && height[r] <= h) r --;
         }
         
@@ -1832,7 +1836,6 @@ public:
                 // 删除最久未使用的结点，即头结点
                 removeNode(node); 
                 hash.erase(node->k);
-                delete(node);
                 tot --; 
             }
             // 新增一个结点
@@ -2000,8 +2003,8 @@ public:
 
         int res = 0;
         while (!Q.empty()) {
-            int layer = Q.size(); // 每一层的结点个数
-            while (layer --) {
+            int layerSize = Q.size(); // 每一层的结点个数
+            while (layerSize --) {
                 TreeNode *p = Q.front();
                 Q.pop();
                 if (p->left) Q.push(p->left);
@@ -2165,10 +2168,154 @@ public:
 
 ### 题解
 
-> 
+> **法一：**$DFS$。
 
 ### CODE
 
 ``` c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        int res = 0;
+        dfs(root, res);
+        
+        return res;
+    }
+
+    int dfs(TreeNode* root, int &res) {
+        if (!root) return 0;
+
+        int left = dfs(root->left, res), right = dfs(root->right, res); // 左、右子树的最大深度
+        res = max(res, left + right); // 直径即左、右子树的最大深度和
+        
+        return max(left, right) + 1; // 返回子树的最大深度
+    }
+};
+```
+
+
+
+## [102. 二叉树的层序遍历 - 力扣（LeetCode）](https://leetcode.cn/problems/binary-tree-level-order-traversal/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$BFS$ 层序遍历。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        if (!root) return vector<vector<int>>(0, vector<int>(0));
+        vector<vector<int>> res;
+        queue<TreeNode*> Q;
+        Q.push(root);
+
+        while (!Q.empty()) {
+            int layerSize = Q.size();
+            
+            vector<int> layer;
+            while (layerSize --) {
+                TreeNode *p = Q.front();
+                Q.pop();
+
+                layer.push_back(p->val);
+
+                if (p->left) Q.push(p->left);
+                if (p->right) Q.push(p->right);
+            }
+            res.push_back(layer);
+        }
+
+        return res;
+    }
+};
+```
+
+
+
+## [108. 将有序数组转换为二叉搜索树 - 力扣（LeetCode）](https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**中序遍历建立整棵二叉树（平衡二叉树，指该树所有结点的左右子树的最大高度相差不超过 $1$）。
+>
+> - 每次以**中点**为**根**，以左半部分为左子树，右半部分为右子树，然后令**根节点的指针分别指向两棵子树**。
+> - 证明：
+>   - 我们证明一个更强的结论，该算法得到的 $BST$ 满足：任意结点的左、右子树的**所有高度**的差不大于 $1$（注意，不
+>     是最大高度)。
+>   - 在每一次递归过程中，左半部分的长度最多比右半部分的长度少 $1$，那会不会有这种情况：左半部分的高度
+>     分别有 $m-1$，$m$，右半部分的高度有 $m$，$m+1$，则当前结点的**所有高度**就是 $m$，$m+1$，$m+2$（要加上当
+>     前根节点这一层，所以都要加 $1$)，则此时树的高度差为 $2$，不平衡。
+>   - 实际上这种情况是不可能的，反证：
+>     - 对于左子树，假设存在高度 $m-1$ 和 $m$，所以左半部分最多有 $2^m-2$ 个元素。
+>     - 对于右子树，假设存在高度 $m$ 和 $m+1$，所以右半部分最少有  $2^m$ 个数，此时左、右子树的元素个数不可能相差 $1$，矛盾。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return build(0, nums.size() - 1, nums);
+    }
+
+    TreeNode* build(int l, int r, vector<int>&nums) {
+        if (l > r) return NULL;
+        
+        int mid = (l + r) / 2;
+        TreeNode *root = new TreeNode(nums[mid]);
+        root->left = build(l, mid - 1, nums), root->right = build(mid + 1, r, nums);
+        
+        return root;
+    }
+};
+```
+
+
+
+## [98. 验证二叉搜索树 - 力扣（LeetCode）](https://leetcode.cn/problems/validate-binary-search-tree/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
+
+### CODE
+
+```c++
 ```
 

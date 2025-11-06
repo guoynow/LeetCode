@@ -2727,15 +2727,19 @@ public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
         TreeNode* res = NULL;
         dfs(root, res, p, q);
+        
         return res;
     }
 
     int dfs(TreeNode* root, TreeNode*& res, TreeNode*& p, TreeNode*& q) {
         if (!root) return 0;
+        
         int st = dfs(root->left, res, p, q) | dfs(root->right, res, p, q); // 自底向上
         if (root == p) st |= 2;
         else if (root == q) st |= 1;
+        
         if (!res && st == 3) res = root;
+        
         return st;
     }
 };
@@ -2771,15 +2775,19 @@ class Solution {
 public:
     int maxPathSum(TreeNode* root) {
         if (!root) return 0;
+        
         int res = -3e7 + 7;
         dfs(root, res);
+        
         return res;
     }
 
     int dfs(TreeNode* root, int& res) {
         if (!root) return 0;
+        
         int l = max(dfs(root->left, res), 0), r = max(dfs(root->right, res), 0);
         res = max(res, root->val + l + r);
+        
         return l > r? root->val + l: root->val + r;
     }
 };

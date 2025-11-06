@@ -4,7 +4,7 @@
 
 ### 题解
 
-> **法一（最优）：**哈希表。
+> **法一：**哈希表。
 >
 > - 因为数据保证有且仅有一组解，假设解为 $[i, j], (i < j)$，则当我们遍历到 $j$ 时， $nums[i]$ 一定在哈希表中。
 >
@@ -18,15 +18,12 @@
 */
 class Solution { 
 public:
-    vector<int> twoSum(vector<int>& nums, int target)
-    {
+    vector<int> twoSum(vector<int>& nums, int target) {
         vector<int> res;
         unordered_map<int,int> hash;
-        for (int i = 0; i < nums.size(); i ++ )
-        {
+        for (int i = 0; i < nums.size(); i ++ ) {
             int another = target - nums[i];
-            if (hash.count(another))
-            {
+            if (hash.count(another)) {
                	res.push_back(hash[another]);
                 res.push_back(i);
                 break;
@@ -59,7 +56,6 @@ public:
                 res.push_back(max(p[i].second, p[j].second));
                 break;
             }
-            
         }
         
         return res;
@@ -1418,6 +1414,7 @@ public:
  *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
  */
+
 class Solution {
 public:
     ListNode* swapPairs(ListNode* head) {
@@ -1460,6 +1457,7 @@ public:
  *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
  */
+
 class Solution {
 public:
     ListNode* reverseList(ListNode* &L, int k) {
@@ -1734,6 +1732,7 @@ public:
  *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
  */
+
 class Solution {
 public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
@@ -1794,6 +1793,13 @@ public:
 ### CODE
 
 ```c++
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+
 class Node {
 public:
     int k, v;
@@ -1865,13 +1871,6 @@ public:
         Lr->prev = node; 
     }
 };
-
-/**
- * Your LRUCache object will be instantiated and called as such:
- * LRUCache* obj = new LRUCache(capacity);
- * int param_1 = obj->get(key);
- * obj->put(key,value);
- */
 ```
 
 
@@ -2461,9 +2460,161 @@ public:
 
 ### 题解
 
-> **法一：**层序遍历。
+> **法一：**$BFS$ 层序遍历。
 >
-> - 层序遍历的变种，每层**从右向左**访问，返回每层的第一个节点（即最右的节点）。
+> - 二叉树最大深度的变种，每层**从右向左**访问，返回每层的第一个节点（即最右的节点）。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        if (!root) return vector<int>(0);
+        queue<TreeNode*> Q;
+        Q.push(root);
+
+        vector<int> res;
+        while (!Q.empty()) {
+            int layerSize = Q.size();
+            res.push_back(Q.front()->val);
+
+            while (layerSize --) {
+                TreeNode* p = Q.front();
+                Q.pop();
+                if (p->right) Q.push(p->right);
+                if (p->left) Q.push(p->left);
+            }
+        }
+
+        return res;
+    }
+};
+```
+
+
+
+## [114. 二叉树展开为链表 - 力扣（LeetCode）](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**树的遍历。
+>
+> - 右链：指一棵子树最右侧的路径。
+> - 从根结点开始迭代：
+>   - 每次将当前结点的左子树的右链，插入到当前结点的右链的最前端。
+>
+> - ```c++
+>   eg. (1)  	1              (2)      1               (3)      1
+>              / \                       \                        \
+>             2   5                       2                        2
+>            / \   \                     / \                        \
+>           3   4   6                   3   4                        3
+>                                            \                        \
+>                                             5                        4
+>                                              \                        \
+>                                               6                        5
+>                                                                         \
+>                                                                          6
+>   ```
+
+# CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        TreeNode *p = root;
+
+        while (p) {
+            if (p->left) {
+                TreeNode *q = p->left; // 左子树 q
+                while (q->right) q = q->right; // 左子树的最右结点 q
+                q->right = p->right; 
+                p->right = p->left; 
+                p->left = NULL;
+            }
+            p = p->right;
+        }
+    }
+};
+```
+
+
+
+## [105. 从前序与中序遍历序列构造二叉树 - 力扣（LeetCode）](https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DFS$ + 哈希表。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        unordered_map<int, int> hash;
+        for (int i = 0; i < inorder.size(); i ++) hash[inorder[i]] = i; // 存储中序遍历的“值 -> 下标”的映射
+        
+        int pIdx = 0, inLeft = 0, inRight = preorder.size() - 1;
+        return dfs(preorder, inorder, hash, pIdx, inLeft, inRight);
+    }
+
+    TreeNode* dfs(vector<int>& pre, vector<int>& in, unordered_map<int, int>& hash, int& pIdx, int inLeft, int inRight) {
+        if (inLeft > inRight) return NULL;
+        TreeNode *p = new TreeNode(pre[pIdx]);
+        
+        int pos = hash[pre[pIdx ++]];
+
+        p->left = dfs(pre, in, hash, pIdx, inLeft, pos - 1); // 构建左子树
+        p->right = dfs(pre, in, hash, pIdx, pos + 1, inRight); // 构建右子树
+        
+        return p;
+    }
+};
+```
+
+
+
+## [437. 路径总和 III - 力扣（LeetCode）](https://leetcode.cn/problems/path-sum-iii/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
 
 ### CODE
 

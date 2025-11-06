@@ -331,7 +331,7 @@ public:
 
 ### 题解
 
-> **法一：**双指针 + 哈希表。
+> **法一：**双指针 + 哈希表（类似[49. 字母异位词分组 - 力扣（LeetCode）](https://leetcode.cn/problems/group-anagrams/description/?envType=study-plan-v2&envId=top-100-liked)）。
 >
 > - 使用哈希表记录 $p$ 的每个字符个数；
 > - 使用指针 $l$ 和指针 $r$ 维护一个固定长度的滑动窗口，使用 $cnt$ 去维护窗口中有多少字符可以作为 $p$ 的异位字符，当 $cnt==p.size()$ 时，当前窗口构成的子串是 $p$ 的异位词：
@@ -2611,6 +2611,238 @@ public:
 
 
 ## [437. 路径总和 III - 力扣（LeetCode）](https://leetcode.cn/problems/path-sum-iii/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**前缀和（类似[560. 和为 K 的子数组 - 力扣（LeetCode）](https://leetcode.cn/problems/subarray-sum-equals-k/description/?envType=study-plan-v2&envId=top-100-liked)）。
+>
+> **法二：**暴力双重递归。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+/*
+法一：前缀和。
+*/
+class Solution {
+public:
+    int pathSum(TreeNode* root, int targetSum) {
+        if (!root) return 0;
+
+        unordered_map<long long, int> hash;
+        long long pre = 0;
+        int res = 0; 
+        hash[0] = 1;
+        dfs(root, res, hash, pre, targetSum);
+
+        return res;
+    }
+
+    void dfs(TreeNode* root, int& res, unordered_map<long long, int>& hash, long long &pre, int& targetSum) {
+        if (!root) return;
+
+        pre += root->val;
+        if (hash[pre - targetSum]) res += hash[pre - targetSum];
+        hash[pre] ++;
+
+        dfs(root->left, res, hash, pre, targetSum), dfs(root->right, res, hash, pre, targetSum);
+        
+        hash[pre] --;
+        pre -= root->val;
+    }
+};
+
+/*
+法二：暴力双重递归。
+*/
+class Solution {
+public:
+    int pathSum(TreeNode* root, int targetSum) {
+        if (!root) return 0;
+
+        int res = 0;
+        long long sum = targetSum;
+        dfsAllTree(root, res, sum);
+
+        return res;
+    }
+
+    void dfsAllTree(TreeNode* root, int& res, long long& sum) {
+        if (!root) return;
+
+        dfsTree(root, res, sum);
+
+        dfsAllTree(root->left, res, sum), dfsAllTree(root->right, res, sum);
+    }
+
+    void dfsTree(TreeNode* root, int& res, long long& sum) {
+        if (!root) return;
+
+        sum -= root->val;
+        if (!sum) res ++;
+
+        dfsTree(root->left, res, sum), dfsTree(root->right, res, sum);
+
+        sum += root->val;
+    }
+};
+```
+
+
+
+## [236. 二叉树的最近公共祖先 - 力扣（LeetCode）](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/submissions/676258950/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：** $DFS$ + 二进制。
+>
+> - $10$ 代表子树中存在 $p$， $11$ 代表子树中存在 $q$。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        TreeNode* res = NULL;
+        dfs(root, res, p, q);
+        return res;
+    }
+
+    int dfs(TreeNode* root, TreeNode*& res, TreeNode*& p, TreeNode*& q) {
+        if (!root) return 0;
+        int st = dfs(root->left, res, p, q) | dfs(root->right, res, p, q); // 自底向上
+        if (root == p) st |= 2;
+        else if (root == q) st |= 1;
+        if (!res && st == 3) res = root;
+        return st;
+    }
+};
+```
+
+
+
+## [124. 二叉树中的最大路径和 - 力扣（LeetCode）](https://leetcode.cn/problems/binary-tree-maximum-path-sum/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：** $DFS$。
+>
+> - 自底向上搜索，每次返回该结点（不含本身）左、右路径的最大值，记为 $l$、$r$；
+> - 若 $l$、$r$ 小于 $0$，则最大和路径必然不包含这一段，置 $0$；
+> - 更新 $res$。
+
+### CODE
+
+```c++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        if (!root) return 0;
+        int res = -3e7 + 7;
+        dfs(root, res);
+        return res;
+    }
+
+    int dfs(TreeNode* root, int& res) {
+        if (!root) return 0;
+        int l = max(dfs(root->left, res), 0), r = max(dfs(root->right, res), 0);
+        res = max(res, root->val + l + r);
+        return l > r? root->val + l: root->val + r;
+    }
+};
+```
+
+
+
+# 九、图论
+
+## [200. 岛屿数量 - 力扣（LeetCode）](https://leetcode.cn/problems/number-of-islands/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$BFS$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        
+        vector<vector<bool>> st(n, vector<bool>(m, false));
+        int res = 0;
+        for (int i = 0; i < n; i ++) {
+            for (int j = 0; j < m; j ++) {
+                if (st[i][j] || grid[i][j] == '0') continue;
+                bfs(grid, st, i, j);
+                res ++;
+            }
+        }
+
+        return res;
+     }
+
+     void bfs(vector<vector<char>>& grid, vector<vector<bool>>& st, int row, int col) {
+        int n = grid.size(), m = grid[0].size();
+        int dx[] = {-1, 1, 0, 0}, dy[] = {0, 0, -1, 1};
+
+        queue<pair<int, int>> Q;
+        Q.push({row, col});
+        st[row][col] = true;
+
+        while (!Q.empty()) {
+            pair<int, int> p = Q.front();
+            Q.pop();
+            for (int i = 0; i < 4; i ++) {
+                int x = p.first + dx[i], y = p.second + dy[i];
+                if (x < 0 || x >= n) continue;
+                if (y < 0 || y >= m) continue;
+                if (st[x][y] || grid[x][y] == '0') continue;
+                Q.push({x, y});
+                st[x][y] = true;
+            }
+        }
+     }
+};
+```
+
+
+
+## [994. 腐烂的橘子 - 力扣（LeetCode）](https://leetcode.cn/problems/rotting-oranges/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
 

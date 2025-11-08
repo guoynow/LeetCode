@@ -104,7 +104,7 @@ public:
 
 > **法一：**集合。
 >
-> - 首先将所有数字放入集合，遍历集合中的元素，因为要找连续的数字序列，因此可以通过向后枚举相邻的数字（即不断加一），判断后面一个数字是否在集合中即可；
+> - 首先将所有数字放入集合，遍历集合中的元素，因为要找连续的数字序列，因此可以通过向后枚举相邻的数字（即不断加一），判断后面一个数字是否在集合中即可。
 >
 > - 为了保证 $O(n)$ 的复杂度，需避免重复枚举序列，因此只对序列的起始数字向后枚举（例如 $[1,2,3,4]$，只对 $1$ 枚举，$2$，$3$，$4$ 时跳过），因此需要判断一下是否是序列的起始数字（即判断一下 $num-1$ 是否在集合中，若不在，则为起始数字）。
 
@@ -166,9 +166,9 @@ public:
 
 >**法一：**双指针。
 >
->- 最开始的时候，如果我们用指针 $l$ 和 $r$ 指向最两端的直线，此时两条直线之间的距离就是最大的，即我们所求矩形面积的宽度 $width$ 为最大；
->- 但是位于最两端的直线不一定是最高的，所以它们组成矩形的面积也就不一定是最大的。因此我们依然需要继续遍历整个数组，这时我们将指向数组两端的指针慢慢往里面收敛，直到找到面积最大值；
->- 对于此时 $l$ 和 $r$ 指向的直线，他们之间的宽度已经是最宽了。于是在收敛的过程中，如果遇到的高度比两端的柱子更低的话，由于之间的宽度更短，所以面积必定更小，我们就可以直接跳过，不予考虑。我们只需要考虑收敛时出现的那些高度更高的柱子；
+>- 最开始的时候，如果我们用指针 $l$ 和 $r$ 指向最两端的直线，此时两条直线之间的距离就是最大的，即我们所求矩形面积的宽度 $width$ 为最大。
+>- 但是位于最两端的直线不一定是最高的，所以它们组成矩形的面积也就不一定是最大的。因此我们依然需要继续遍历整个数组，这时我们将指向数组两端的指针慢慢往里面收敛，直到找到面积最大值。
+>- 对于此时 $l$ 和 $r$ 指向的直线，他们之间的宽度已经是最宽了。于是在收敛的过程中，如果遇到的高度比两端的柱子更低的话，由于之间的宽度更短，所以面积必定更小，我们就可以直接跳过，不予考虑。我们只需要考虑收敛时出现的那些高度更高的柱子。
 >- 该方法在双指针向中间收敛的过程中，对数组中的每个元素只访问了一次，因此时间复杂度为 $O(n)$。
 
 ### CODE
@@ -184,9 +184,9 @@ public:
             int h = min(height[l], height[r]);
             res = max(res, h * (r - l));
             
-            // 若 height[l] > h 则 l 不会更新；
-            // 若 height[r] > h 则 r 不会更新；
-            // 若 height[l] == height[r]，则 l、r 同时更新；
+            // 若 height[l] > h 则 l 不会更新
+            // 若 height[r] > h 则 r 不会更新
+            // 若 height[l] == height[r]，则 l、r 同时更新
             while (l < r && height[l] <= h) l ++; 
             while (l < r && height[r] <= h) r --;
         }
@@ -208,9 +208,9 @@ public:
 >- 在找符合条件搭配的过程中，假设 $sum = nums[i] + nums[l] + nums[r]$，
 >   - 若 $sum > 0$ ，则 $r$ 往左走，使 $sum$ 变小；
 >   - 若 $sum < 0$ ，则$l$往右走，使 $sum$ 变大；
->   - 若 $sum == 0$ ，则表示找到了与 $nums[i]$ 搭配的组合 $nums[l]$ 和 $nums[r]$，存到 $res$ 中；
+>   - 若 $sum == 0$ ，则表示找到了与 $nums[i]$ 搭配的组合 $nums[l]$ 和 $nums[r]$，存到 $res$ 中。
 >- 判重处理：
->   - 当 $nums[i] == nums[i - 1]$，表示当前确定好的数与上一个一样，需要直接 $continue$；
+>   - 当 $nums[i] == nums[i - 1]$，表示当前确定好的数与上一个一样，需要直接 $continue$。
 >   - 当找符合 $sum == 0$ 时，需要对 $nums[l]$ 和 $nums[r]$ 进行判重。
 
 ### CODE
@@ -253,11 +253,11 @@ public:
 
 >**法一：**三次线性扫描。
 >
->- 观察整个图形，考虑对水的面积按**列**进行拆解；
+>- 观察整个图形，考虑对水的面积按**列**进行拆解。
 >
->- 注意到，每个矩形条上方所能接受的水的高度，是由它**左边最高**的矩形，和**右边最高**的矩形决定的。具体地，假设第 $i$ 个矩形条的高度为 $height[i]$，且矩形条左边最高的矩形条的高度为 $left_{max}[i]$，右边最高的矩形条高度为 $right_{max}[i]$，则该矩形条上方能接受水的高度为 $min(left_{max}[i],right_{max}[i]) - height[i]$；
+>- 注意到，每个矩形条上方所能接受的水的高度，是由它**左边最高**的矩形，和**右边最高**的矩形决定的。具体地，假设第 $i$ 个矩形条的高度为 $height[i]$，且矩形条左边最高的矩形条的高度为 $left_{max}[i]$，右边最高的矩形条高度为 $right_{max}[i]$，则该矩形条上方能接受水的高度为 $min(left_{max}[i],right_{max}[i]) - height[i]$。
 >
->- 需要分别从左向右扫描求 $left_{max}$，从右向左求 $right_{max}$，最后统计答案即可；
+>- 需要分别从左向右扫描求 $left_{max}$，从右向左求 $right_{max}$，最后统计答案即可。
 >
 >- 注意特判 $n$ 为 $0$。
 
@@ -301,7 +301,7 @@ public:
 >
 > - 定义指针 $l$ 和指针 $r$，表示当前扫描到的子串是 $[l, r]$（闭区间）。扫描过程中维护一个哈希表，表示 $[i,j] $中每个字符出现的次数。
 > - 线性扫描时，每次循环的流程如下：
->   - 指针 $r$ 向后移一位，同时将哈希表中 $s[r]$ 的计数加一： $hash[s[r]]++$；
+>   - 指针 $r$ 向后移一位，同时将哈希表中 $s[r]$ 的计数加一： $hash[s[r]]++$。
 >   - 假设 $j$ 移动前的区间 $[l, r]$ 中没有重复字符，则 $r$ 移动后，只有 $s[r]$ 可能出现 $2$ 次。因此我们不断向后移动 $l$ ，直至区
 >     间 $[l, r]$ 中  $s[r]$ 的个数等于 $1$ 为止。
 > - 复杂度分析：由于 $l$ ,  $r$ 均最多增加 $n$ 次，且哈希表的插入和更新操作的复杂度都是 $O(1)$，因此，总时间复杂度 $O(n)$。
@@ -333,9 +333,9 @@ public:
 
 > **法一：**双指针 + 哈希表（类似[49. 字母异位词分组 - 力扣（LeetCode）](https://leetcode.cn/problems/group-anagrams/description/?envType=study-plan-v2&envId=top-100-liked)）。
 >
-> - 使用哈希表记录 $p$ 的每个字符个数；
+> - 使用哈希表记录 $p$ 的每个字符个数。
 > - 使用指针 $l$ 和指针 $r$ 维护一个固定长度的滑动窗口，使用 $cnt$ 去维护窗口中有多少字符可以作为 $p$ 的异位字符，当 $cnt==p.size()$ 时，当前窗口构成的子串是 $p$ 的异位词：
->   - 指针 $r$ 向右访问 $s[r]$ 时，记录窗口中字符 $s[r]$ 的数量，若小于等于 $p$ 中该字符的数量，则说明 $s[r]$ 可以作为 $p$ 的一个异位字符，则 $cnt++$；
+>   - 指针 $r$ 向右访问 $s[r]$ 时，记录窗口中字符 $s[r]$ 的数量，若小于等于 $p$ 中该字符的数量，则说明 $s[r]$ 可以作为 $p$ 的一个异位字符，则 $cnt++$。
 >   - 维护固定长度的滑动窗口：
 >     - 若 $s[l]$ 的字符数量，小于等于 $p$ 中该字符的数量，说明 $s[l]$ 是 $p$ 的一个异位字符，则 $cnt--$；
 >     - 指针 $l$ 右移，并维护窗口中字符 $s[l]$ 的数量，即 $sHash[s[l ++]] --$。
@@ -484,28 +484,28 @@ public:
 
 >**法一：**递推。
 >
->- 每次考虑以下标 $i$ 结尾的子串最大和 $pre$；
+>- 每次考虑以下标 $i$ 结尾的子串最大和 $pre$。
 >- 当考虑下标 $i + 1$ 时：
->  - 若 $pre >= 0$，则 $i + 1$ 的子串最大和，为 $pre + nums[i + 1]$；
->  - 若 $pre < 0$， 则 $i + 1$ 的子串最大和，为 $nums[i + 1]$；
+>  - 若 $pre >= 0$，则 $i + 1$ 的子串最大和，为 $pre + nums[i + 1]$。
+>  - 若 $pre < 0$， 则 $i + 1$ 的子串最大和，为 $nums[i + 1]$。
 >- 记录全局最大和 $res$ ，即 $res = max(res, pre)$。
 >
 >**法二：**分治。
 >
 >- 对于一个区间 $[l, r]$，维护四个值，分别是：总和 $sum$；非空最大子段和 $s$；前缀非空最大子段和 $ls$；后缀非空最大
->  子段和 $rs$；
+>  子段和 $rs$。
 >
 >- 分别递归左右子区间并合并：
 >
->  - 对于 $sum$ ，则是左右子区间的 $sum$ 之和；
+>  - 对于 $sum$ ，则是左右子区间的 $sum$ 之和。
 >  - 对于 $s$ ，则有三种情况取最大值：
 >    - 左区间的 $s$；
 >    - 右区间的 $s$；
->    - 左区间的 $rs$ 加上右区间的 $ls$；
+>    - 左区间的 $rs$ 加上右区间的 $ls$。
 >  - 对于 $ls$ ，则有两种情况取最大值：
 >    - 左区间的 $ls$；
->    - 左区间的 $sum$ 加上右区间的 $ls$；
->  - 对于 $rs$ 同理；
+>    - 左区间的 $sum$ 加上右区间的 $ls$。
+>  - 对于 $rs$ 同理。
 >
 >  - 合并后返回递归的结果。
 
@@ -636,10 +636,11 @@ public:
 
 >**法一：**模拟。
 >
->- 若 $nums$ 中**不存在** $0$，计算 $nums$ 的积 $mul$，$nums[i]$ 的 $answer[i]$ 为 $mul / nums[i]$；
+>- 若 $nums$ 中**不存在** $0$，计算 $nums$ 的积 $mul$，$nums[i]$ 的 $answer[i]$ 为 $mul / nums[i]$。
 >- 若 $nums$ 中**存在一个** $0$，计算 $nums$ 的积 $mul$ 时跳过 $0$，则：
 >  - $nums[i]$ **等于** $0$ 时，$nums[i]$ 的 $answer[i]$ 为 $mul / nums[i]$；
->  - $nums[i]$ **不等于** $0$ 时，因为其他元素含 $0$，故$nums[i]$ 的 $answer[i]$ 为 $0$；
+>  - $nums[i]$ **不等于** $0$ 时，因为其他元素含 $0$，故$nums[i]$ 的 $answer[i]$ 为 $0$。
+>
 >- 若 $nums$ 中**存在两个及以上的** $0$，则 $answer[i]$ 为必然 $0$。
 >
 >**法二：**前缀积 + 后缀积。
@@ -709,7 +710,7 @@ public:
 
 >**法一：**利用下标进行标记。
 >
->- 把 $1 \sim n$ 的数放到数组下标$0 \sim n - 1$的位置；
+>- 把 $1 \sim n$ 的数放到数组下标$0 \sim n - 1$的位置。
 >- 遍历数组，如果下标为 $i$，元素不是 $i + 1$，说明缺了这个正整数。
 
 ### CODE
@@ -746,8 +747,8 @@ public:
 
 > **法一：**使用第一行和第一列进行原地标记。
 >
-> - 用两个变量记录第一行和第一列是否有 $0$；
-> - 遍历整个矩阵，用矩阵的**第一行和第一列**记录对应的行和列是否有 $0$；
+> - 用两个变量记录第一行和第一列是否有 $0$。
+> - 遍历整个矩阵，用矩阵的**第一行和第一列**记录对应的行和列是否有 $0$。
 > - 把含有 $0$ 的行和列都置成 $0$。
 
 ### CODE
@@ -818,8 +819,8 @@ public:
 
 > **法一：**模拟。
 >
-> - 使用  $dx[] = \{0, 1, 0, -1\}, dy[] = \{1, 0, -1, 0\}$ 模拟螺旋矩阵的四个方向，即右，下，左，上；
-> - 若按方向移动后，超出边界，或遇到已访问元素，需要更新方向；
+> - 使用  $dx[] = \{0, 1, 0, -1\}, dy[] = \{1, 0, -1, 0\}$ 模拟螺旋矩阵的四个方向，即右，下，左，上。
+> - 若按方向移动后，超出边界，或遇到已访问元素，需要更新方向。
 
 ### CODE
 
@@ -857,8 +858,8 @@ public:
 
 > **法一：**翻转代替旋转。
 >
-> - 顺时针 $90°$： **主对角线**（从左上到右下）翻转，然后从**中间水平**翻转；
-> - 逆时针 $90°$： **主对角线**翻转，然后从**中间上下**翻转；
+> - 顺时针 $90°$： **主对角线**（从左上到右下）翻转，然后从**中间水平**翻转。
+> - 逆时针 $90°$： **主对角线**翻转，然后从**中间上下**翻转。
 > - 顺时针 $180°$（等价于逆时针 $180°$）：**主对角线**翻转，然后**副对角线**（从左下到右上）翻转。
 
 ### CODE
@@ -895,8 +896,8 @@ public:
 > **法二：**贪心。
 >
 > - 我们可以从矩阵 $matrix$ 的右上角 $(0,n−1)$ 进行搜索。在每一步的搜索过程中，如果我们位于位置 $(x,y)$，那么我们希望在以 $matrix$ 的左下角为左下角、以 $(x,y)$ 为右上角的矩阵中进行搜索，即行的范围为 $[x,m−1]$，列的范围为 $[0,y]$：
-> - 如果 $matrix[x,y]=target$，说明搜索完成；
-> - 如果 $matrix[x,y]>target$，由于每一列的元素都是升序排列的，那么在当前的搜索矩阵中，所有位于第 $y$ 列的元素都是严格大于 $target$ 的，因此我们可以将它们全部忽略，即将 $y$ 减少 $1$；
+> - 如果 $matrix[x,y]=target$，说明搜索完成。
+> - 如果 $matrix[x,y]>target$，由于每一列的元素都是升序排列的，那么在当前的搜索矩阵中，所有位于第 $y$ 列的元素都是严格大于 $target$ 的，因此我们可以将它们全部忽略，即将 $y$ 减少 $1$。
 > - 如果 $matrix[x,y]<target$，由于每一行的元素都是升序排列的，那么在当前的搜索矩阵中，所有位于第 $x$ 行的元素都是严格小于 $target$ 的，因此我们可以将它们全部忽略，即将 $x$ 增加 $1$。
 
 ### CODE
@@ -976,7 +977,7 @@ public:
 class Solution {
 public:
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
-        ListNode *p = headA, *q = headB; // 用两个指针分别从两个链表头部开始扫描，每次分别走一步；
+        ListNode *p = headA, *q = headB; // 用两个指针分别从两个链表头部开始扫描，每次分别走一步
         while (p != q) {
             if (p) p = p->next; 
             else p = headB; // 如果指针走到 null，则从另一个链表头部开始走
@@ -1497,8 +1498,8 @@ public:
 
 ### 题解
 
-> - 遍历链表，在每一个原结点后，复制一个相同的结点（不复制 $random$ 指针）；
-> - 遍历链表，给复制的新结点添加 $random$ 指针（即原结点 $random$ 指针的 $next$，注意 $random$ 是否为 $NULL$）；
+> - 遍历链表，在每一个原结点后，复制一个相同的结点（不复制 $random$ 指针）。
+> - 遍历链表，给复制的新结点添加 $random$ 指针（即原结点 $random$ 指针的 $next$，注意 $random$ 是否为 $NULL$）。
 > - 分割出原链表和新链表。
 
 ### CODE
@@ -1787,7 +1788,7 @@ public:
 
 > **法一：**哈希表+双链表。
 >
-> - 用 `unordered_map<int, Node*>` 存储 $key$ 到**存储结点**的映射，即可 $O(1)$ 查询对应结点的位置；
+> - 用 `unordered_map<int, Node*>` 存储 $key$ 到**存储结点**的映射，即可 $O(1)$ 查询对应结点的位置。
 > - 用双链表存储当前的 $LRUCache$，**每次访问**结点 $node$，将其**删除**，然后**插入到链表尾部**。经过这样的操作，**头结点**就是**最久未使用**的结点。
 
 ### CODE
@@ -2753,8 +2754,8 @@ public:
 
 > **法一：** $DFS$。
 >
-> - 自底向上搜索，每次返回该结点（不含本身）左、右路径的最大值，记为 $l$、$r$；
-> - 若 $l$、$r$ 小于 $0$，则最大和路径必然不包含这一段，置 $0$；
+> - 自底向上搜索，每次返回该结点（不含本身）左、右路径的最大值，记为 $l$、$r$。
+> - 若 $l$、$r$ 小于 $0$，则最大和路径必然不包含这一段，置 $0$。
 > - 更新 $res$。
 
 ### CODE
@@ -2837,9 +2838,7 @@ public:
             Q.pop();
             for (int i = 0; i < 4; i ++) {
                 int x = p.first + dx[i], y = p.second + dy[i];
-                if (x < 0 || x >= n) continue;
-                if (y < 0 || y >= m) continue;
-                if (st[x][y] || grid[x][y] == '0') continue;
+                if (x < 0 || x >= n || y < 0 || y >= m || st[x][y] || grid[x][y] == '0') continue;
                 Q.push({x, y});
                 st[x][y] = true;
             }
@@ -2854,10 +2853,332 @@ public:
 
 ### 题解
 
-> 
+> **法一：**$BFS$。
 
 ### CODE
 
 ```c++
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+
+        queue<pair<int, int>> Q;
+        vector<vector<int>> dist(n, vector<int>(m, 0x3f3f3f3f));
+        init(grid, dist, Q, n, m); // 初始化距离和队列
+
+        int dx[] = {-1, 1, 0, 0}, dy[] = {0, 0, -1, 1};
+
+        while (!Q.empty()) {
+            pair<int, int> p = Q.front();
+            Q.pop();
+
+            for (int i = 0; i < 4; i ++) {
+                int x = p.first + dx[i], y = p.second + dy[i];
+                if (x < 0 || x >= n || y < 0 || y >= m || grid[x][y] == 0) continue;
+
+                if (dist[x][y] > dist[p.first][p.second] + 1) {
+                    dist[x][y] = dist[p.first][p.second] + 1;
+                    Q.push({x, y});
+                }
+            }
+        }
+
+        int res = 0;
+        for (int i = 0; i < n; i ++)
+            for (int j = 0; j < m; j ++) {
+                if (grid[i][j] != 0)
+                    res = max(res, dist[i][j]);
+            }
+        cout << res << endl;
+        if (res >= 0x3f3f3f3f) res = -1;
+
+        return res;
+    }
+
+    void init(vector<vector<int>>& grid, vector<vector<int>>& dist, queue<pair<int, int>>& Q, int& n, int& m) {
+        for (int i = 0; i < n; i ++) {
+            for (int j = 0; j < m; j ++) {
+                if (grid[i][j] == 2) {
+                    dist[i][j] = 0;
+                    Q.push({i, j});
+                }
+            }
+        }
+    }
+};
 ```
+
+
+
+# 十、回溯
+
+
+
+# 十一、二分查找
+
+## [35. 搜索插入位置 - 力扣（LeetCode）](https://leetcode.cn/problems/search-insert-position/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**高精二分。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        return SL(nums, target);
+    }
+
+    int SL(vector<int>& arr, int target) {
+        int l = -1, r = arr.size();
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (arr[mid] < target) l = mid;
+            else r = mid;
+        }
+
+        return r;
+    }
+};
+```
+
+
+
+## [74. 搜索二维矩阵 - 力扣（LeetCode）](https://leetcode.cn/problems/search-a-2d-matrix/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**一维映射到二维。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        return SL(matrix, target);
+    }
+
+    bool SL(vector<vector<int>>& mat, int target) {
+        int n = mat.size(), m = mat[0].size();
+        
+        int l = -1, r = n * m;
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            int row = mid / m, col = mid % m;
+            if (mat[row][col] < target) l = mid;
+            else r = mid;
+        }
+
+        if (r == n * m) return false;    
+        return mat[r / m][r % m] == target;
+    }
+};
+```
+
+
+
+## [34. 在排序数组中查找元素的第一个和最后一个位置 - 力扣（LeetCode）](https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**高精二分。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        return {SL(nums, target), SR(nums, target)};
+    }
+
+    int SL(vector<int>& arr, int target) {
+        int l = -1, r = arr.size();
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (arr[mid] < target) l = mid;
+            else r = mid;
+        }
+        
+        return r != arr.size() && arr[r] == target? r: -1;
+    }
+
+    int SR(vector<int>& arr, int target) {
+        int l = -1, r = arr.size();
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (arr[mid] > target) r = mid;
+            else l = mid;
+        }
+        
+        return l != -1 && arr[l] == target? l: -1;
+    }
+};
+```
+
+
+
+## [33. 搜索旋转排序数组 - 力扣（LeetCode）](https://leetcode.cn/problems/search-in-rotated-sorted-array/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**一次二分扫描。
+>
+> - 已知数组被分为左、右两个升序部分，且后半部分全部比 $nums[0]$ 小。
+> - 如果 $nums[i] >= nums[0]$，则说明 $[0, i]$ 一定是升序的，否则 $[i, n - 1]$ 一定是升序的。
+> - 根据 $target$ 与 $nums[0]$ 的大小关系，判断出 $target$ 可能属于哪一段。
+>
+> **法二：**两次二分扫描。
+>
+> - 左半段满足 $nums[i]>=nums[0]$，右半段满足 $nums[i] < nums[0]$，满足二分性质，二分查找它们的边界。
+> - 根据 $target$ 与 $nums[0]$ 的大小关系，判断出 $target$ 可能属于哪一段，再次使用二分查找。
+
+### CODE
+
+```c++
+/*
+法一：一次二分扫描。
+*/
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        return SL(nums, target);
+    }
+
+    int SL(vector<int>& arr, int target) {
+        int l = -1, r = arr.size();
+
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (arr[mid] >= arr[0]) { // 说明 mid 在左半段
+                if (arr[mid] < target) l = mid; // 说明 target 也在左半段，正常考虑
+                else { // target 不确定在哪一段
+                    if (target >= arr[0]) r = mid; // target 在左半段，正常考虑
+                    else l = mid; // target 在右半段， 特殊考虑
+                }
+            }
+            else { // 说明 mid 在右半段
+                if (arr[mid] < target) { // target 不确定在哪一段
+                    if (target < arr[0]) l = mid; // target 在右半段，正常考虑
+                    else r = mid; // target 在左半段，特殊考虑
+                }
+                else r = mid; // 说明 target 也在右半段，正常考虑
+            }
+        }
+
+        return r != arr.size() && arr[r] == target? r: -1;
+    }
+};
+
+/*
+法二：两次二分扫描。
+*/
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int l = -1, r = nums.size();
+        int bound = SL(nums, target, 0, l, r);
+        
+        if (target >= nums[0]) l = -1, r = bound;
+        else l = bound - 1, r = nums.size();
+        return SL(nums, target, 1, l, r);
+    }
+
+    int SL(vector<int>& arr, int target, int mode, int l, int r) {
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (mode == 1) {
+                if (arr[mid] < target) l = mid;
+                else r = mid;
+            }
+            else {
+                if (arr[mid] < arr[0]) r= mid;
+                else l = mid;
+            }
+        }
+
+        if (mode == 1) return r != arr.size() && arr[r] == target? r: -1;
+        return r;
+    }
+};
+```
+
+
+
+## [153. 寻找旋转排序数组中的最小值 - 力扣（LeetCode）](https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**二分（类似[33. 搜索旋转排序数组 - 力扣（LeetCode）](https://leetcode.cn/problems/search-in-rotated-sorted-array/description/?envType=study-plan-v2&envId=top-100-liked)中**法二**）。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        return search(nums, -1, nums.size());
+    }
+
+    int search(vector<int>& arr, int l, int r) {
+        while (l + 1 < r) {
+            int mid = l + r >> 1;
+            if (arr[mid] < arr[0]) r = mid;
+            else l = mid;
+        }
+
+        return r == arr.size()? arr[0]: arr[r];
+    }
+};
+```
+
+
+
+## [4. 寻找两个正序数组的中位数 - 力扣（LeetCode）](https://leetcode.cn/problems/median-of-two-sorted-arrays/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**分治。
+>
+> - 将问题转化成求两个数组中第 $k$ 小的元素。
+> - 每次在切片 $nums1[i, nums1.size() - 1]$ 和切片 $nums2[j, nums2.size() - 1]$ 中求它们的第 $k/2$ 小的元素，为了简化问题表述，我们假设 $nums1[i, nums1.size() - 1]$ 的长度总是小于 $nums2[j, nums2.size() - 1]$ 。
+>   - 易得，$nums1$ 切片中第 $k/2$ 小的元素下标为 $ik = min(n - 1, i + k / 2 - 1)$，而 $nums2$ 第 $k/2$ 小的元素下标为 $jk = j + k / 2 - 1$，因为假设前者切片更短，故不存在后者切片不够 $k/2$ 个元素的情况。
+>   - 若 $nums1[ik] < nums2[jk]$，说明 $nums1[i,ik]$ 中元素都小于第 $k$ 小元素，故在区间 $nums1[ik+1, nums1.size()-1]$ 进行下一轮查找。
+>   - 若 $nums1[ik] >= nums2[jk]$，在区间 $nums2[jk+1, nums1.size()-1]$ 进行下一轮查找。
+> - 当 $k==1$时，返回 $min(nums1[i], nums2[j])$；当 $nums1$ 切片为空，则返回 $nums2[j + k - 1]$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int n = nums1.size(), m = nums2.size(), sum = nums1.size() + nums2.size();
+        if (sum % 2) return getKthNumber(nums1, 0, nums2, 0, sum / 2 + 1);
+        else {
+            int left = getKthNumber(nums1, 0, nums2, 0, sum / 2);
+            int right = getKthNumber(nums1, 0, nums2, 0, sum / 2 + 1);
+            return (left + right) / 2.0;
+        }
+    }
+
+    int getKthNumber(vector<int>& nums1, int i, vector<int>& nums2, int j, int k) {
+        int n = nums1.size(), m = nums2.size();
+        if (n - i > m - j) return getKthNumber(nums2, j, nums1, i, k);
+        
+        if (i == n) return nums2[j + k - 1];
+        if (k == 1) return min(nums1[i], nums2[j]);
+        
+        int ik = min(n - 1, i + k / 2 - 1), jk = j + k / 2 - 1;
+        // nums1 切片中不一定有 k / 2 个元素，(ik - i + 1) 为真实元素个数，而不是 k / 2
+        if (nums1[ik] < nums2[jk]) return getKthNumber(nums1, ik + 1, nums2, j, k - (ik - i + 1)); 
+        else return getKthNumber(nums1, i, nums2, jk + 1, k - k / 2);
+    }
+};
+```
+
 

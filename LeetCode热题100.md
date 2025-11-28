@@ -3182,3 +3182,159 @@ public:
 ```
 
 
+
+# 十五、动态规划
+
+## [70. 爬楼梯 - 力扣（LeetCode）](https://leetcode.cn/problems/climbing-stairs/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**略。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int climbStairs(int n) {
+        vector<int> dp(n + 7, 0);
+        dp[1] = 1, dp[2] = 2;
+
+        for (int i = 3; i <= n; i ++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+
+        return dp[n];
+    }
+};
+```
+
+
+
+## [118. 杨辉三角 - 力扣（LeetCode）](https://leetcode.cn/problems/pascals-triangle/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**略。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int>> rows(1, vector<int>(1, 1));
+        for (int i = 2; i <= numRows; i ++) {
+            vector<int> row(i, 0);
+            row[0] = 1, row[i - 1] = 1;
+            for (int j = 1; j < i - 1; j ++) {
+                row[j] = rows[i - 2][j - 1] + rows[i - 2][j];
+            }
+            rows.push_back(row);
+        }
+
+        return rows;
+    }
+};
+```
+
+
+
+## [198. 打家劫舍 - 力扣（LeetCode）](https://leetcode.cn/problems/house-robber/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $dp[i][0]$ 表示考虑前 $i$ 个房间，且**不盗窃**第 $i$  个房间时，所获最大收益。
+> - 状态 $dp[i][1]$ 表示考虑前 $i$ 个房间，且**盗窃**第 $i$  个房间时，所获最大收益。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        vector<vector<int>> dp(nums.size() + 7, vector<int>(2, 0));
+        dp[0][0] = 0, dp[0][1] = nums[0];
+        for (int i = 1; i < nums.size(); i ++) { // 因为 dp[i] 仅需 dp[i-1] 的值，故可优化为滚动数组，空间复杂度 O(1)。
+            dp[i][0] = max(dp[i - 1][0], dp[i - 1][1]); 
+            dp[i][1] = dp[i - 1][0] + nums[i];
+        }
+
+        return max(dp[nums.size()-1][0], dp[nums.size()-1][1]);
+    }
+};
+```
+
+
+
+## [279. 完全平方数 - 力扣（LeetCode）](https://leetcode.cn/problems/perfect-squares/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**DFS。
+>
+> **法二：**DP。
+>
+> - 状态 $dp[i]$ 表示数字 $i$ 所需的完全平方数的最少数量。
+
+### CODE
+
+```c++
+/*
+法一：DFS。
+*/
+class Solution {
+public:
+    int numSquares(int n) {
+        int res = 0x3f3f3f3f;
+
+        dfs(0, n, res);
+
+        return res;
+    }
+
+    void dfs(int u, int target, int &res) {
+        if (u >= res) return; // 剪枝
+        if (target == 0) res = min(u, res);
+
+        for (int i = sqrt(target); i >= 1; i --) {
+            dfs(u + 1, target - i * i, res);
+        }
+    }
+};
+
+/*
+法二：DP。
+*/
+class Solution {
+public:
+    int numSquares(int n) {
+        vector<int> dp(n + 7, 0x3f3f3f3f);
+        dp[0] = 0;
+        for (int i = 1; i <= n; i ++) {
+            for (int j = sqrt(i); j >= 1; j --) {
+                dp[i] = min(dp[i], dp[i - j * j] + 1);
+            }
+        }
+
+        return dp[n];
+    }
+
+};
+```
+
+
+
+## [322. 零钱兑换 - 力扣（LeetCode）](https://leetcode.cn/problems/coin-change/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
+
+### CODE
+
+```c++
+```
+

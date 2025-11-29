@@ -3330,10 +3330,69 @@ public:
 
 ### 题解
 
-> 
+> 题解：完全背包问题。相当于有 $coins.size()$ 种物品，每种物品的体积是 $coins$ 值，价值是 $1$,问装满背包最少需要多少价值的物品？。
+>
+> - $dp[i][j] = min(dp[i-1][j],~~~dp[i-1][j-coins[i]]+1,~~~dp[i-1][j-2*coins[i]]+2,~~~dp[i-1][j-3*coins[i]]+3,~.....)$ 。
+>
+> - $dp[i][j-coins[i]]= min(dp[i-1][j-coins[i]],~~~dp[i-1][j-2*coins[i]] + 1,~~~dp[i-1][j-3*coins[i]]+2,~~~.....)$。
+> - 易得状态转移方程 $dp[i][j] = min(dp[i][j-coins[i]]+1,~~~dp[i-1][j])$。
+> - 优化空间后得：$dp[j] = min(dp[j-coins[i]]+1, ~~~dp[j])$。
 
 ### CODE
 
 ```c++
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        vector<int> dp(amount + 7, 0x3f3f3f3f);
+        dp[0] = 0;
+
+        for (int i = 0; i < coins.size(); i ++ )
+            for (int j = coins[i]; j <= amount; j ++ )
+                dp[j] = min(dp[j], dp[j - coins[i]] + 1);
+
+        return dp[amount] == 0x3f3f3f3f? -1: dp[amount];
+    }
+};
+```
+
+
+
+## [139. 单词拆分 - 力扣（LeetCode）](https://leetcode.cn/problems/word-break/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+### CODE
+
+```c++
+```
+
+
+
+## [300. 最长递增子序列 - 力扣（LeetCode）](https://leetcode.cn/problems/longest-increasing-subsequence/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**状态 $dp[i]$ 表示以 $nums[i]$ 为结尾的最长递增子序列。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        vector<int> dp(nums.size() + 7, 1);
+
+        int res = 0;
+        for (int i = 0; i < nums.size(); i ++) {
+            for (int j = 0; j < i; j ++) {
+                if (nums[j] < nums[i]) dp[i] = max(dp[i], dp[j] + 1);
+            }
+            res = max(res, dp[i]);
+        }
+
+        return res;
+    }
+};
 ```
 

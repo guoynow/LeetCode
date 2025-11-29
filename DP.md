@@ -90,8 +90,8 @@ int main() {
 
 > **法一：**$DP$。
 >
-> - $dp[i][j] = max(dp[i-1,j],~dp[i-1,j-v]+w,~dp[i-1,j-2*v]+2*w,~dp[i-1,j-3*v]+3*w,~.....)$ 。
-> - $dp[i,j-v]= max(dp[i-1,j-v],~dp[i-1,j-2*v] + w,~dp[i-1,j-3*v]+2*w,~.....)$。
+> - $dp[i][j] = max(dp[i-1][j],~dp[i-1][j-v]+w,~dp[i-1][j-2*v]+2*w,~dp[i-1][j-3*v]+3*w,~.....)$ 。
+> - $dp[i][j-v]= max(dp[i-1][j-v],~dp[i-1][j-2*v] + w,~dp[i-1][j-3*v]+2*w,~.....)$。
 > - 易得状态转移方程 $dp[i][j] = max(dp[i][j-v]+w,dp[i-1][j])$。
 > - 空间优化同 $01$ 背包。
 
@@ -121,4 +121,82 @@ int main() {
     return 0;
 }
 ```
+
+
+
+## [AcWing 4. 多重背包问题 I - AcWing](https://www.acwing.com/activity/content/problem/content/999/)
+
+### 题解
+
+> **法一：**转换为 $01$ 背包问题，将 $k$ 个相同物品，转换 $v,w$ 相同的 $k$ 个不同物品。值得注意的是，多重背包问题可以通过**二进制方法优化**，但本文不做赘述。
+
+### CODE
+
+```c++
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N = 1e3 + 7;
+
+int n, m, s, v, w;
+int dp[N];
+
+int main() {
+    scanf("%d%d", &n, &m);
+    
+    for (int i = 1; i <= n; i ++) {
+        scanf("%d%d%d", &v, &w, &s);
+        while (s --){ // 做了 s 次 01 背包
+            for (int j = m; j >= v; j --) dp[j] = max(dp[j], dp[j - v] + w);
+        }
+        
+    }
+    
+    printf("%d", dp[m]);
+    return 0;
+}
+```
+
+
+
+## [9. 分组背包问题 - AcWing题库](https://www.acwing.com/problem/content/9/)
+
+### 题解
+
+> **法一：**转换为 $01$ 背包问题，每次更新 $dp[j]$ 时考虑同组的不同物品。
+
+### CODE
+
+```c++
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N = 1e3 + 7;
+
+int n, m, s;
+int dp[N], v[N], w[N];
+
+int main() {
+    scanf("%d%d", &n, &m);
+    
+    for (int i = 1; i <= n; i ++) {
+        scanf("%d", &s);
+        for (int k = 0; k < s; k ++) scanf("%d%d", &v[k], &w[k]);
+        
+        for (int j = m; j >= 0; j --) {
+            // 更新 d[j] 时，不会影响 j 之前的值，循环 s 次相当于最终只拿了一个物品
+            for (int k = 0; k < s; k ++) if(j >= v[k]) dp[j] = max(dp[j], dp[j - v[k]] + w[k]);
+        }
+    }
+    
+    printf("%d", dp[m]);
+    return 0;
+}
+```
+
+
+
+# 二、[898. 数字三角形 - AcWing题库](https://www.acwing.com/problem/content/900/)
 

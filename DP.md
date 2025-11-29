@@ -198,5 +198,5 @@ int main() {
 
 
 
-# 二、[898. 数字三角形 - AcWing题库](https://www.acwing.com/problem/content/900/)
+# 二、线性 DP
 

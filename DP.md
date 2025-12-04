@@ -200,3 +200,142 @@ int main() {
 
 # 二、线性 DP
 
+## [898. 数字三角形 - AcWing题库](https://www.acwing.com/problem/content/900/)
+
+### 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $dp[i][j]$ 表示从 $(1,1)$ 到 $(i,j)$ 所有方案的最大值。
+> - 由于每次只能走**左下**或**右下**，所有只有 $dp[i-1][j-1]$ 和 $dp[i-1][j]$ 能走到 $dp[i][j]$。
+> -  易得状态转移方程为：$dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - 1]) + arr[i][j]$。
+
+### CODE
+
+```c++
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N = 5e2 + 7;
+
+int n;
+int arr[N][N], dp[N][N];
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i ++) {
+        for (int j = 1; j <= i; j ++) {
+            scanf("%d", &arr[i][j]);
+        }
+    }
+    
+    memset(dp, 0xbf, sizeof(dp));
+    dp[1][1] = arr[1][1], dp[2][1] = arr[1][1] + arr[2][1], dp[2][2] = arr[1][1] + arr[2][2];
+    for (int i = 3; i <= n; i ++) {
+        for (int j = 1; j <= i; j ++) {
+            dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - 1]) + arr[i][j];
+        }
+    }
+    
+    int res = 0xbfbfbfbf;
+    for (int j = 1; j <= n; j ++) res = max(res, dp[n][j]);
+    
+    printf("%d", res);
+    return 0;
+}
+```
+
+
+
+## [AcWing 895. 最长上升子序列 - AcWing](https://www.acwing.com/activity/content/problem/content/1003/)
+
+## 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $dp[i]$ 表示以 $arr[i]$ 为结尾的，最长上升子序列。
+>
+> **法二：**二分。
+>
+> - 维护一个子序列 $seq$，$seq$ 的长度代表**当前最长上升子序列**的长度。注，$seq$ 内的元素含义，并**不是当前最长上升子序列**，我们需要的是 $seq$ 的长度。
+> - 遍历数组 $arr$：
+>   - 用二分找到 $seq$ 中第一个**大于等于** $arr[i]$ 的元素位置 $j$，令 $seq[j] = arr[i]$，从而保证子序列仍然是上升的。
+>   - 若 $arr[i]$ 比 $seq$ 中的所有元素都大，就将其添加到 $seq$ 的末尾。
+>   - 最终，$seq$ 的长度就是最长上升子序列的长度。
+
+## CODE
+
+```c++
+/*
+法一：DP。
+*/
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N = 1e3 + 7;
+
+int n;
+vector<int> arr(N, 0), dp(N, 1);
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i ++) scanf("%d", &arr[i]);
+    
+    for (int i = 2; i <= n; i ++) {
+        for (int j = 1; j < i; j ++) {
+            if (arr[j] < arr[i]) dp[i] = max(dp[i], dp[j] + 1);
+        }
+    }
+    
+    printf("%d", *max_element(dp.begin(), dp.end()));
+    return 0;
+}
+
+/*
+法二：二分。
+*/
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int N = 1e3 + 7;
+
+int n;
+vector<int> arr(N, 0), seq;
+
+int SL(int k) {
+    int l = -1, r = seq.size();
+    while (l + 1 < r) {
+        int mid = l + r >> 1;
+        if (seq[mid] < k) l = mid;
+        else r = mid;
+    }
+    
+    return r;
+}
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i ++) scanf("%d", &arr[i]);
+    
+    seq.push_back(arr[1]);
+    for (int i = 2; i <= n; i ++) {
+        int j = SL(arr[i]);
+        if (j == seq.size()) seq.push_back(arr[i]);
+        else seq[j] = arr[i];
+    }
+    
+    printf("%d", seq.size());
+    return 0;
+}
+```
+
+
+
+## [AcWing 896. 最长上升子序列 II - AcWing](https://www.acwing.com/activity/content/problem/content/1004/)
+
+### 题解
+
+### CODE

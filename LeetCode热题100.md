@@ -3373,7 +3373,9 @@ public:
 
 ### 题解
 
-> **法一：**状态 $dp[i]$ 表示以 $nums[i]$ 为结尾的最长递增子序列。
+> **法一：**$DP$。
+>
+> - 状态 $dp[i]$ 表示以 $arr[i]$ 为结尾的，最长上升子序列。
 
 ### CODE
 
@@ -3394,5 +3396,16 @@ public:
         return res;
     }
 };
+```
+
+
+
+## [152. 乘积最大子数组 - 力扣（LeetCode）](https://leetcode.cn/problems/maximum-product-subarray/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+### CODE
+
+```c++
 ```
 

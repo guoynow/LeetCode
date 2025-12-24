@@ -3197,14 +3197,14 @@ public:
 class Solution {
 public:
     int climbStairs(int n) {
-        vector<int> dp(n + 7, 0);
-        dp[1] = 1, dp[2] = 2;
+        vector<int> f(n + 7, 0);
+        f[1] = 1, f[2] = 2;
 
         for (int i = 3; i <= n; i ++) {
-            dp[i] = dp[i - 1] + dp[i - 2];
+            f[i] = f[i - 1] + f[i - 2];
         }
 
-        return dp[n];
+        return f[n];
     }
 };
 ```
@@ -3246,8 +3246,8 @@ public:
 
 > **法一：**$DP$。
 >
-> - 状态 $dp[i][0]$ 表示考虑前 $i$ 个房间，且**不盗窃**第 $i$  个房间时，所获最大收益。
-> - 状态 $dp[i][1]$ 表示考虑前 $i$ 个房间，且**盗窃**第 $i$  个房间时，所获最大收益。
+> - 状态 $f[i][0]$ 表示考虑前 $i$ 个房间，且**不盗窃**第 $i$  个房间时，所获最大收益。
+> - 状态 $f[i][1]$ 表示考虑前 $i$ 个房间，且**盗窃**第 $i$  个房间时，所获最大收益。
 
 ### CODE
 
@@ -3255,14 +3255,14 @@ public:
 class Solution {
 public:
     int rob(vector<int>& nums) {
-        vector<vector<int>> dp(nums.size() + 7, vector<int>(2, 0));
-        dp[0][0] = 0, dp[0][1] = nums[0];
-        for (int i = 1; i < nums.size(); i ++) { // 因为 dp[i] 仅需 dp[i-1] 的值，故可优化为滚动数组，空间复杂度 O(1)。
-            dp[i][0] = max(dp[i - 1][0], dp[i - 1][1]); 
-            dp[i][1] = dp[i - 1][0] + nums[i];
+        vector<vector<int>> f(nums.size() + 7, vector<int>(2, 0));
+        f[0][0] = 0, f[0][1] = nums[0];
+        for (int i = 1; i < nums.size(); i ++) { // 因为 f[i] 仅需 f[i-1] 的值，故可优化为滚动数组，空间复杂度 O(1)。
+            f[i][0] = max(f[i - 1][0], f[i - 1][1]); 
+            f[i][1] = f[i - 1][0] + nums[i];
         }
 
-        return max(dp[nums.size()-1][0], dp[nums.size()-1][1]);
+        return max(f[nums.size()-1][0], f[nums.size()-1][1]);
     }
 };
 ```
@@ -3277,7 +3277,7 @@ public:
 >
 > **法二：**DP。
 >
-> - 状态 $dp[i]$ 表示数字 $i$ 所需的完全平方数的最少数量。
+> - 状态 $f[i]$ 表示数字 $i$ 所需的完全平方数的最少数量。
 
 ### CODE
 
@@ -3311,15 +3311,15 @@ public:
 class Solution {
 public:
     int numSquares(int n) {
-        vector<int> dp(n + 7, 0x3f3f3f3f);
-        dp[0] = 0;
+        vector<int> f(n + 7, 0x3f3f3f3f);
+        f[0] = 0;
         for (int i = 1; i <= n; i ++) {
             for (int j = sqrt(i); j >= 1; j --) {
-                dp[i] = min(dp[i], dp[i - j * j] + 1);
+                f[i] = min(f[i], f[i - j * j] + 1);
             }
         }
 
-        return dp[n];
+        return f[n];
     }
 };
 ```
@@ -3332,11 +3332,11 @@ public:
 
 > 题解：完全背包问题。相当于有 $coins.size()$ 种物品，每种物品的体积是 $coins$ 值，价值是 $1$,问装满背包最少需要多少价值的物品？。
 >
-> - $dp[i][j] = min(dp[i-1][j],~~~dp[i-1][j-coins[i]]+1,~~~dp[i-1][j-2*coins[i]]+2,~~~dp[i-1][j-3*coins[i]]+3,~.....)$ 。
+> - $f[i][j] = min(f[i-1][j],~~~f[i-1][j-coins[i]]+1,~~~f[i-1][j-2*coins[i]]+2,~~~f[i-1][j-3*coins[i]]+3,~.....)$ 。
 >
-> - $dp[i][j-coins[i]]= min(dp[i-1][j-coins[i]],~~~dp[i-1][j-2*coins[i]] + 1,~~~dp[i-1][j-3*coins[i]]+2,~~~.....)$。
-> - 易得状态转移方程 $dp[i][j] = min(dp[i][j-coins[i]]+1,~~~dp[i-1][j])$。
-> - 优化空间后得：$dp[j] = min(dp[j-coins[i]]+1, ~~~dp[j])$。
+> - $f[i][j-coins[i]]= min(f[i-1][j-coins[i]],~~~f[i-1][j-2*coins[i]] + 1,~~~f[i-1][j-3*coins[i]]+2,~~~.....)$。
+> - 易得状态转移方程 $f[i][j] = min(f[i][j-coins[i]]+1,~~~f[i-1][j])$。
+> - 优化空间后得：$f[j] = min(f[j-coins[i]]+1, ~~~f[j])$。
 
 ### CODE
 
@@ -3344,14 +3344,14 @@ public:
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
-        vector<int> dp(amount + 7, 0x3f3f3f3f);
-        dp[0] = 0;
+        vector<int> f(amount + 7, 0x3f3f3f3f);
+        f[0] = 0;
 
         for (int i = 0; i < coins.size(); i ++ )
             for (int j = coins[i]; j <= amount; j ++ )
-                dp[j] = min(dp[j], dp[j - coins[i]] + 1);
+                f[j] = min(f[j], f[j - coins[i]] + 1);
 
-        return dp[amount] == 0x3f3f3f3f? -1: dp[amount];
+        return f[amount] == 0x3f3f3f3f? -1: f[amount];
     }
 };
 ```
@@ -3375,7 +3375,7 @@ public:
 
 > **法一：**$DP$。
 >
-> - 状态 $dp[i]$ 表示以 $arr[i]$ 为结尾的，最长上升子序列。
+> - 状态 $f[i]$ 表示以 $arr[i]$ 为结尾的，最长上升子序列。
 
 ### CODE
 
@@ -3383,14 +3383,14 @@ public:
 class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) {
-        vector<int> dp(nums.size() + 7, 1);
+        vector<int> f(nums.size() + 7, 1);
 
         int res = 0;
         for (int i = 0; i < nums.size(); i ++) {
             for (int j = 0; j < i; j ++) {
-                if (nums[j] < nums[i]) dp[i] = max(dp[i], dp[j] + 1);
+                if (nums[j] < nums[i]) f[i] = max(f[i], f[j] + 1);
             }
-            res = max(res, dp[i]);
+            res = max(res, f[i]);
         }
 
         return res;

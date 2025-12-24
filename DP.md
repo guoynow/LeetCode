@@ -379,10 +379,13 @@ int main() {
 
 ### 题解
 
-> 法一：DP。
+> 法一：$DP$。
 >
 > - 状态 $dp[i][j]$ 表示将 $s1[i]$ 变为 $s2[j]$ 的最短编辑距离 ($s1$、$s2$ 下标从 $1$ 开始）。
->   
+> - 删除操作：删除 $s1[i]$ 之后，$s1[1 \sim i]$ 和 $s2[1 \sim j]$匹配，那么之前要先做到 $s1[1 \sim (i-1)]$ 和 $s2[1 \sim j]$ 匹配，故 $dp[i-1][j] + 1$。
+> - 插入操作：插入 $s2[j]$ 之后，$s1[1 \sim i]$ 与 $s2[1 \sim j]$ 完全匹配，那么之前要先做到 $s1[1 \sim i]$ 和 $s2[1 \sim (j-1)]$ 匹配，故 $dp[i][j-1] + 1$。
+> - 替换操作：把 $s1[i]$ 改成 $s2[j]$ 之后，$s1[1 \sim i]$ 与 $s2[1 \sim j]$ 匹配 ，那么之前要先做到 $s1[1 \sim (i-1)]$ 应该与 $s2[1 \sim (j-1)]$ 匹配，故 $dp[i-1][j-1] + 1$。若本来 $s1[i]== s2[j]$，则无需替换，即 $dp[i-1][j-1] + 0$。
+>
 
 ### CODE
 
@@ -406,9 +409,10 @@ int main() {
     
     for (int i = 1; i <= n; i ++) {
         for(int j = 1; j <= m; j ++) {
-            dp[i][j] = min(dp[i - 1][j] + 1, dp[i][j - 1] + 1);
-            if (s1[i] == s2[j]) dp[i][j] = min(dp[i][j], dp[i - 1][j - 1]);
-            else dp[i][j] = min(dp[i][j], dp[i - 1][j - 1] + 1);
+            dp[i][j] = min(dp[i - 1][j] + 1, dp[i][j - 1] + 1); // 删除操作，插入操作
+            
+            if (s1[i] == s2[j]) dp[i][j] = min(dp[i][j], dp[i - 1][j - 1]); // 替换操作
+            else dp[i][j] = min(dp[i][j], dp[i - 1][j - 1] + 1); // 替换操作
 
         }
     }
@@ -416,5 +420,18 @@ int main() {
     printf("%d", dp[n][m]);
     return 0;
 }
+```
+
+
+
+## [AcWing 899. 编辑距离 - AcWing](https://www.acwing.com/activity/content/problem/content/1006/)
+
+## 题解
+
+> 
+
+## CODE
+
+```c++
 ```
 

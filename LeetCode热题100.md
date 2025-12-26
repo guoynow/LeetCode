@@ -3332,7 +3332,7 @@ public:
 
 > 题解：完全背包问题。相当于有 $coins.size()$ 种物品，每种物品的体积是 $coins$ 值，价值是 $1$,问装满背包最少需要多少价值的物品？。
 >
-> - $f[i][j] = min(f[i-1][j],~~~f[i-1][j-coins[i]]+1,~~~f[i-1][j-2*coins[i]]+2,~~~f[i-1][j-3*coins[i]]+3,~.....)$ 。
+> - $f[i][j] = min(f[i-1][j],~~~f[i-1][j-coins[i]]+1,~~~f[i-1][j-2*coins[i]]+2,~~~f[i-1][j-3*coins[i]]+3,~.....)$。
 >
 > - $f[i][j-coins[i]]= min(f[i-1][j-coins[i]],~~~f[i-1][j-2*coins[i]] + 1,~~~f[i-1][j-3*coins[i]]+2,~~~.....)$。
 > - 易得状态转移方程 $f[i][j] = min(f[i][j-coins[i]]+1,~~~f[i-1][j])$。
@@ -3362,9 +3362,92 @@ public:
 
 ### 题解
 
+> **法一：**DP。
+>
+> - 状态 $f[i]$ 表示 $s_0 \sim s_i$ 能否被词典组成。
+> - 构造集合 $unordered set$，因为 $vector$ 查找效率低下。
+> - 遍历字符串 $s$，判断有没有某个断点 $j$ 刚好可以满足 $s_j \sim s_i$ 在词典中。若在词典中，且 $s_0 \sim s_{j - 1}$ 能被词典组成（即 $f[j-1]==true$），则 $s_0 \sim s_i$ 能被词典组成，即 $f[i]==true$。
+
 ### CODE
 
 ```c++
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        int n = s.size();
+        s = " " + s; // 令下标从 1 开始
+        
+        vector<bool> f(n + 7, false);
+        unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+
+        f[0] = 1;
+        for (int i = 1; i <= n; i ++) {
+            for (int j = i; j >= 1; j --) {
+                if (wordSet.find(s.substr(j, i - j + 1)) != wordSet.end() && f[j - 1]) 
+                    f[i] = true; 
+            }
+        }
+
+        return f[n];
+    }
+};
+```
+
+
+
+## [140. 单词拆分 II - 力扣（LeetCode）](https://leetcode.cn/problems/word-break-ii/description/)
+
+### 题解
+
+> 法一：$139$ 加 $DFS$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    void dfs(int u, string& s, unordered_set<string>& wordSet, vector<bool>& f, vector<string>& curStr, vector<string>& res) {
+        if (u == 0) {
+            string curRes;
+            for (int i = curStr.size() - 1; i >= 0; i --) {
+                if (i < curStr.size() - 1) curRes += ' ' + curStr[i];
+                else curRes += curStr[i];
+            } 
+            res.push_back(curRes);
+        }
+
+        for (int j = u; j >= 1; j --) {
+            if (wordSet.find(s.substr(j, u - j + 1)) == wordSet.end() || f[j - 1] == false) continue;
+            curStr.push_back(s.substr(j, u - j + 1));
+            dfs(j - 1, s, wordSet, f, curStr, res);
+            curStr.pop_back();
+
+        }
+    }
+
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+        int n = s.size();
+
+        s = ' ' + s;
+        unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+        vector<bool> f(n + 7, false);
+
+        f[0] = true;
+        for (int i = 1; i <= n; i ++) {
+            for (int j = i; j >= 1; j --) {
+                if (wordSet.find(s.substr(j, i - j + 1)) != wordSet.end() && f[j - 1]) {
+                    f[i] = true;
+                }
+            }
+        }
+
+
+        vector<string> curStr, res;
+        dfs(n, s, wordSet, f, curStr, res);
+
+        return res;
+    }
+};
 ```
 
 
@@ -3403,6 +3486,47 @@ public:
 ## [152. 乘积最大子数组 - 力扣（LeetCode）](https://leetcode.cn/problems/maximum-product-subarray/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
+
+> 题解：$DP$ + 滚动数组优化。
+>
+> - 状态 $f[i]$ 表示所有从 $0$ 到 $i$ 并且选用 $nums[i]$ 获得的最大乘积；状态 $g[i]$ 表示所有从 $0$ 到 $i$ 并且选用 $nums[i]$ 获得的最小乘积 。
+> - 当 $nums[i] >= 0$ 时：
+>   - $f[i] = max(nums[i], f[i - 1] * nums[i])$，$g[i] = min(nums[i], g[i - 1] * nums[i])$。
+> - 当 $nums[i] < 0$ 时：
+>   - $f[i] = max(nums[i], g[i - 1] * nums[i])$，$g[i] = min(nums[i], f[i - 1] * nums[i])$。
+> - 将上述两点化简，得到统一的状态转移方程：
+>   - $f[i]=max(nums[i], max(f[i - 1] * nums[i], g[i - 1] * nums[i]))$。
+>   - $g[i]=min(nums[i], min(f[i - 1] * nums[i], g[i - 1] * nums[i]))$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int n = nums.size();
+        
+        int res = nums[0], f = nums[0], g = nums[0];
+
+        for (int i = 1; i < nums.size(); i ++) {
+            int ft = f * nums[i], gt = g * nums[i];
+            f = max(nums[i], max(ft, gt));
+            g = min(nums[i], min(ft, gt));
+            res = max(res, f);
+        }
+       
+        return res;
+    }
+};
+```
+
+
+
+## [416. 分割等和子集 - 力扣（LeetCode）](https://leetcode.cn/problems/partition-equal-subset-sum/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
 
 ### CODE
 

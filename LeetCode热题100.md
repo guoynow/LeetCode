@@ -3428,7 +3428,7 @@ public:
     vector<string> wordBreak(string s, vector<string>& wordDict) {
         int n = s.size();
 
-        s = ' ' + s;
+        s = " " + s;
         unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
         vector<bool> f(n + 7, false);
 
@@ -3526,10 +3526,92 @@ public:
 
 ### 题解
 
+> 题解：$01$ 背包问题变种（必须装满背包）。
+>
+> - 问题等价于，是否存在子数组，使得子数组的和等于整个数组和的 $1/2$。
+> - 将背包体积视为**整个数组和的 $1/2$**。
+> - 将物品 $i$ **体积**视为 $num[i]$，**价值**视为任意数，这里视为 $1$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int m = 0;
+        for (int i = 0; i < nums.size(); i ++) m += nums[i];
+        if (m % 2) return false; // 数组和无法被 2 整除，说明不存在
+
+        m /= 2;
+        vector<int> f(m + 7, -1);
+
+        f[0] = 0;
+        for (int i = 1; i <= nums.size(); i ++) {
+            int v = nums[i - 1];
+            for (int j = m; j >= v; j --) {
+                if (f[j - v] != -1) f[j] = max(f[j], f[j - v] + 1); 
+            }
+        }
+        
+        return f[m] != -1; // -1 代表无法装满背包
+    }
+};
+```
+
+
+
+## [32. 最长有效括号 - 力扣（LeetCode）](https://leetcode.cn/problems/longest-valid-parentheses/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
 > 
 
 ### CODE
 
 ```c++
+```
+
+
+
+# 十六、多维动态规划
+
+## [5. 最长回文子串 - 力扣（LeetCode）](https://leetcode.cn/problems/longest-palindromic-substring/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 法一：$DP$。
+>
+> - 状态 $f[i][j]$ 表示 $s_i \sim s_j$ 是否为回文子串。
+
+### CODE
+
+```
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int n = s.size();
+        vector<vector<bool>> f(n + 7, vector<bool>(n + 7, false));
+
+        s = " " + s;
+        
+        for (int i = 0; i <= n; i ++) f[i][i] = true; // 一个字符必定回文
+
+        int l = 1, r = 1;
+        for (int len = 2; len <= n; len ++) {
+            for (int i = 1; i + len - 1 <= n; i ++) {
+                int j = i + len - 1;
+                
+                if (s[i] == s[j] && (len == 2 || f[i + 1][j - 1]) ) { // len 为 2 时，中间没有字符
+                    f[i][j] = true;
+                    if (r - l + 1 < len) {
+                        l = i, r = j;
+                    }
+                }
+            }
+        }
+
+        return s.substr(l, r - l + 1);
+    }
+};
 ```
 

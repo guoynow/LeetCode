@@ -432,9 +432,6 @@ int main() {
 > - 关键点：最后一次合并一定是左边连续的一部分和右边连续的一部分进行合并。
 > - 状态 $f[i][j]$ 表示表示将 $i$ 到 $j$ 这一段石子合并成一堆的最小代价。
 >
-> **法二：**记忆化搜索。
->
-> - 
 
 ### CODE
 
@@ -456,13 +453,12 @@ int main() {
     }
     
     memset(f, 0x3f, sizeof(f));
-    for (int len = 1; len <= n; len ++) { // 枚举区间长度
+    for (int i = 0; i <= n; i ++) f[i][i] = 0; // 初始的一堆石子不需要合并，无需代价
+    
+    for (int len = 2; len <= n; len ++) { // 枚举区间长度
         for (int i = 1; i + len - 1 <= n; i ++) {
             int j = i + len - 1;
-            if (i == j) {
-                f[i][j] = 0;
-                continue;
-            }
+
             for (int k = i; k <= j - 1; k ++) {
                 f[i][j] = min(f[i][j], f[i][k] + f[k + 1][j] + s[j] - s[i - 1]);
             }

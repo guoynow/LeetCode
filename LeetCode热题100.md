@@ -3344,14 +3344,15 @@ public:
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
-        vector<int> f(amount + 7, 0x3f3f3f3f);
+        int INF = 0x3f3f3f3f;
+        vector<int> f(amount + 7, INF);
         f[0] = 0;
 
         for (int i = 0; i < coins.size(); i ++ )
             for (int j = coins[i]; j <= amount; j ++ )
-                f[j] = min(f[j], f[j - coins[i]] + 1);
+                if (f[j - coins[i]] != INF) f[j] = min(f[j], f[j - coins[i]] + 1);
 
-        return f[amount] == 0x3f3f3f3f? -1: f[amount];
+        return f[amount] == INF? -1: f[amount];
     }
 };
 ```
@@ -3427,8 +3428,8 @@ public:
 
     vector<string> wordBreak(string s, vector<string>& wordDict) {
         int n = s.size();
-
         s = " " + s;
+        
         unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
         vector<bool> f(n + 7, false);
 
@@ -3487,7 +3488,7 @@ public:
 
 ### 题解
 
-> 题解：$DP$ + 滚动数组优化。
+> **法一：**$DP$ + 滚动数组优化。
 >
 > - 状态 $f[i]$ 表示所有从 $0$ 到 $i$ 并且选用 $nums[i]$ 获得的最大乘积；状态 $g[i]$ 表示所有从 $0$ 到 $i$ 并且选用 $nums[i]$ 获得的最小乘积 。
 > - 当 $nums[i] >= 0$ 时：
@@ -3526,7 +3527,7 @@ public:
 
 ### 题解
 
-> 题解：$01$ 背包问题变种（必须装满背包）。
+> **法一：**$01$ 背包问题变种（必须装满背包）。
 >
 > - 问题等价于，是否存在子数组，使得子数组的和等于整个数组和的 $1/2$。
 > - 将背包体积视为**整个数组和的 $1/2$**。
@@ -3544,8 +3545,8 @@ public:
 
         m /= 2;
         vector<int> f(m + 7, -1);
-
         f[0] = 0;
+        
         for (int i = 1; i <= nums.size(); i ++) {
             int v = nums[i - 1];
             for (int j = m; j >= v; j --) {
@@ -3564,11 +3565,85 @@ public:
 
 ### 题解
 
-> 
+> **法一：**线性扫描。
+>
+> - 假设当前从前到后统计合法括号子串，令**左括号**的权值为 $1$，**右括号**的权值为 $-1$。
+>   - 首先记录 $st$ 为某个起点，则在 $i$ 向后移动的过程中：
+>     - 若当前 $[st,i]$ 区间和**等于** $0$，该字符串是合法的，更新答案；
+>     - 若区间和**大于** $0$，则说明目前缺少**右括号**，可以不修改 $st$；
+>     - 若区间和**小于** $0$，则说明目前缺少**左括号**，区间已经不合法了，需要修正 $st$ 为 $i+1$。
+>   - 可是对于 “$...((((合法)((($” 这种情况（左括号太多，导致区间和无法为 0），以上算法不能够准确捕捉到最长的合法子串，此时逆向考虑，将以上过程反向，从后向前统计，即可处理所有的情况。
+>
+> **法二：**$DP$。
+>
+> - 状态 $f[i]$ 表示以 $s_i$（下标从 $1$ 开始）结尾的最长有效括号。
+> - 若 $s[i] == ~'('$，则不可能有效，因为必定缺少右括号。
+> - 若 $s[i] == ~')'$：
+>   - 若 $s[i - 1] == ~'('$，则 $s_i和s_{i-1}$ 正好有效配对，易得 $f[i] = 2 + f[i - 2]$。
+>   - 若 $s[i - 1] == ~')'$，则需要对 $s[i - 1 - f[i - 1]]$ 进行判断：
+>     - 若 $s[i - 1 - f[i - 1]] == ~'('$，说明 $s_i和s_{i-1-f[i-1]}$ 有效配对。因为消除了$s[i - 1 - f[i - 1]]$ 的左括号，所以可以与前一个有效子串连接起来，易得 $f[i] = 2 + f[i - 1] + f[i - 1 - f[i - 1] - 1]$。
 
 ### CODE
 
 ```c++
+/*
+法一：线性扫描。
+*/
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        int res = 0, n = s.size();
+		s = " " + s;
+    
+        int st = 1, v = 0;
+        for (int i = 1; i <= n; i ++) {
+            s[i] == '('? v ++: v --;
+
+            if (v < 0) v = 0, st = i + 1;
+            else if (v == 0) res = max(res, i - st + 1);
+        }
+
+        st = n, v = 0;
+        for (int i = n; i >= 1; i --) {
+            s[i] == ')'? v ++: v --;
+
+            if (v < 0) v = 0, st = i - 1;
+            else if (v == 0) res = max(res, st - i + 1);
+        }
+
+        return res;
+    }
+};
+
+/*
+法二：DP。
+*/
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        int n = s.size();
+        s = " " + s;
+
+        vector<int> f(n + 7, 0);
+        int res = 0;
+
+        for (int i = 2; i <= n; i++) {
+            if (s[i] == '(') continue;
+
+            if (s[i - 1] == '(') {
+                f[i] = 2 + f[i - 2];
+                res = max(res, f[i]);
+            }
+            else if (i - 1 - f[i - 1] >= 1 && s[i - 1 - f[i - 1]] == '(') {
+                if (i - 2 - f[i - 1]) f[i] = 2 + f[i - 1] + f[i - 2 - f[i - 1]];
+                else f[i] = 2 + f[i - 1];
+                res = max(res, f[i]);
+            } 
+        }
+
+        return res;
+    }
+};
 ```
 
 

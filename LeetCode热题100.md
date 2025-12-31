@@ -3650,6 +3650,73 @@ public:
 
 # 十六、多维动态规划
 
+## [62. 不同路径 - 力扣（LeetCode）](https://leetcode.cn/problems/unique-paths/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $f[i][j]$ 代表 $(1, 1)$ 到 $(i, j)$ 的所有方案数量。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        swap(m, n);
+        vector<vector<int>> f(n + 7, vector<int>(m + 7, 0));
+
+        f[1][1] = 1;
+
+        for (int i = 1; i <= n; i ++) {
+            for (int j = 1; j <= m; j ++) {
+                if (i == 1 && j == 1) continue;
+                f[i][j] = f[i - 1][j] + f[i][j - 1];
+            }
+        }
+
+        return f[n][m];
+    }
+};
+```
+
+
+
+## [64. 最小路径和 - 力扣（LeetCode）](https://leetcode.cn/problems/minimum-path-sum/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $f[i][j]$ 代表 $(1, 1)$ 到 $(i, j)$ 的最小代价。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+
+        vector<vector<int>> f(n + 7, vector<int>(m + 7, 0x3f3f3f3f));
+        
+        f[1][1] = grid[0][0];
+
+        for (int i = 1; i <= n; i ++) {
+            for (int j = 1; j <= m; j ++) {
+                if (i == 1 && j == 1) continue;
+                f[i][j] = min(f[i - 1][j], f[i][j - 1]) + grid[i - 1][j - 1];
+            }
+        }
+
+        return f[n][m];
+    }
+};
+```
+
+
+
 ## [5. 最长回文子串 - 力扣（LeetCode）](https://leetcode.cn/problems/longest-palindromic-substring/description/?envType=study-plan-v2&envId=top-100-liked)
 
 ### 题解
@@ -3686,6 +3753,85 @@ public:
         }
 
         return s.substr(l, r - l + 1);
+    }
+};
+```
+
+
+
+## [1143. 最长公共子序列 - 力扣（LeetCode）](https://leetcode.cn/problems/longest-common-subsequence/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $f[i][j]$  表示 $s1$ 的前 $i$ 个字母，在 $s2$ 的前 $j$ 个字母的最长公共子序列。
+> - 若 $s1[i]== s2[j]$，那么 $f[i][j]$ 的值等于 $f[i - 1][j - 1] + 1$，即 $f[i][j] = f[i - 1][j - 1] + 1$。
+> - 若 $s1[i]~!= s2[j]$，那么此时 $f[i][j]$ 的值等于 $f[i - 1][j]$ 和 $f[i][j - 1]$ 的最大值，即 $f[i][j] = max(f[i - 1][j], f[i][j - 1])$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int n = text1.size(), m = text2.size();
+        text1 = " " + text1;
+        text2 = " " + text2;
+
+        vector<vector<int>> f(n + 7, vector<int>(m + 7, 0));
+
+        for (int i = 1; i <= n; i ++) {
+            for (int j = 1; j <= m; j ++) {
+                if (text1[i] == text2[j]) f[i][j] = f[i - 1][j - 1] + 1;
+                else f[i][j] = max(f[i - 1][j], f[i][j - 1]);
+            }
+        }
+
+        return f[n][m];
+    }
+};
+```
+
+
+
+
+
+## [72. 编辑距离 - 力扣（LeetCode）](https://leetcode.cn/problems/edit-distance/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $f[i][j]$ 表示将 $s1[i]$ 变为 $s2[j]$ 的最短编辑距离 ($s1$、$s2$ 下标从 $1$ 开始）。
+> - **删除**操作：删除 $s1[i]$ 之后，$s1[1 \sim i]$ 和 $s2[1 \sim j]$匹配，那么之前要先做到 $s1[1 \sim (i-1)]$ 和 $s2[1 \sim j]$ 匹配，故 $f[i-1][j] + 1$。
+> - **插入**操作：插入 $s2[j]$ 之后，$s1[1 \sim i]$ 与 $s2[1 \sim j]$ 完全匹配，那么之前要先做到 $s1[1 \sim i]$ 和 $s2[1 \sim (j-1)]$ 匹配（当且仅当在 $s1[1 \sim i]$ 末尾插入 $s2[j]$ 时，才能完全匹配），故 $f[i][j-1] + 1$。
+> - **替换**操作：把 $s1[i]$ 改成 $s2[j]$ 之后，$s1[1 \sim i]$ 与 $s2[1 \sim j]$ 匹配 ，那么之前要先做到 $s1[1 \sim (i-1)]$ 应该与 $s2[1 \sim (j-1)]$ 匹配，故 $f[i-1][j-1] + 1$。若本来 $s1[i]== s2[j]$，则无需替换，即 $f[i-1][j-1] + 0$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int minDistance(string word1, string word2) {
+        int n = word1.size(), m = word2.size();
+        word1 = " " + word1;
+        word2 = " " + word2;
+
+        vector<vector<int>> f(n + 7, vector<int>(m + 7, 0x3f3f3f3f));
+
+        for (int i = 0; i <= n; i ++) f[i][0] = i;
+        for (int i = 0; i <= m; i ++) f[0][i] = i;
+
+
+        for (int i = 1; i <= n; i ++) {
+            for (int j = 1; j <= m; j ++) {
+                f[i][j] = min(f[i - 1][j] + 1, f[i][j - 1] + 1);
+                f[i][j] = min(f[i][j], f[i - 1][j - 1] + (word1[i] != word2[j]));
+            }
+        }
+
+        return f[n][m];
     }
 };
 ```

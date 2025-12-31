@@ -3183,6 +3183,133 @@ public:
 
 
 
+# 十四、贪心算法
+
+## [121. 买卖股票的最佳时机 - 力扣（LeetCode）](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**维护 $i$ 之前最小的买入价格。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int res = 0, minp = prices[0];
+        for (auto price : prices) {
+            res = max(res, price - minp);
+            minp = min(minp, price);
+        }
+        return res;
+    }
+};
+```
+
+
+
+## [55. 跳跃游戏 - 力扣（LeetCode）](https://leetcode.cn/problems/jump-game/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**$last + nums[last]$ 代表当前可以走到的最远地方。如果发现 $i$ 之前所有位置均无法到达 $i$，则直接返回 $false$。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int last = 0;
+        for (int i = 1; i < nums.size(); i ++) {
+            while (last < i && i > last + nums[last]) last ++; // 维护当前可以走到的最远地方
+            if (last == i) return false; // 说明 [0 ~ i-1] 都无法走到 i
+        }
+        return true;
+    }
+};
+```
+
+
+
+## [45. 跳跃游戏 II - 力扣（LeetCode）](https://leetcode.cn/problems/jump-game-ii/submissions/688372551/)
+
+## 题解
+
+> **法一：**$DP$。
+>
+> - 状态 $f[i]$ 表示到达 $i$ 所需要的最少步数。
+> - $last$ 为**第一次**能够到达 $i$ 时的**上一步**位置，易得 $f[i]=f[last]+1$。
+>
+> **法二：**双指针。
+>
+> - 定义指针 $cur$ 和 $dis$，分别表示**当前位置**和可达到的**最远位置**。定义一轮遍历过程如下：移动 $cur$ 到 $dis$，途中记录可以达到的最远位置 $next$。
+>   更新 $dis$ 为 $next$，答案加 1。
+> - 当 $dis$ 大于等于 $n-1$ 时视为到达，返回答案。
+
+### CODE
+
+```c++
+/*
+法一：DP。
+*/
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        const int n = nums.size();
+        
+        vector<int> f(n + 7);
+        f[0] = 0;
+        int last = 0;
+
+        for (int i = 1; i < n; i++) {
+            while (i > last + nums[last]) last++; // 题目保证可以到达最后一步，故无需向 I 一样判断。
+            f[i] = f[last] + 1; 
+        }
+
+        return f[n - 1];
+    }
+};
+
+/*
+法二：双指针。
+*/
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        const int n = nums.size();
+        int res = 0, cur = 0, dis = 0;
+
+        while (dis < n - 1) {
+            int next = 0;
+            while (cur <= dis) {
+                next = max(next, cur + nums[cur]);
+                cur ++;
+            }
+
+            res ++;
+            dis = next;
+        }
+
+        return res;
+    }
+};
+```
+
+
+
+## [763. 划分字母区间 - 力扣（LeetCode）](https://leetcode.cn/problems/partition-labels/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+### CODE
+
+```c++
+```
+
+
+
 # 十五、动态规划
 
 ## [70. 爬楼梯 - 力扣（LeetCode）](https://leetcode.cn/problems/climbing-stairs/description/?envType=study-plan-v2&envId=top-100-liked)

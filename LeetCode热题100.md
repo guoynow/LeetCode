@@ -3183,6 +3183,96 @@ public:
 
 
 
+# 十三、堆
+
+## [215. 数组中的第K个最大元素 - 力扣（LeetCode）](https://leetcode.cn/problems/kth-largest-element-in-an-array/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> **法一：**快排变种。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        q_sort(nums, k, 0, nums.size() - 1);
+        return nums[k - 1];
+    }
+
+    void q_sort(vector<int>& nums, int k, int l, int r) {
+        if (l >= r) return;
+
+        int i = l - 1, j = r + 1, x = nums[l + r >> 1];
+        while (i < j) {
+            while (nums[++ i] > x);
+            while (nums[-- j] < x);
+            if (i < j) swap(nums[i], nums[j]);
+        }
+
+        int len = j - l + 1;
+        if (k <= len) q_sort(nums, k, l, j);
+        else q_sort(nums, k - len, j + 1, r);
+    }
+};
+```
+
+
+
+## [347. 前 K 个高频元素 - 力扣（LeetCode）](https://leetcode.cn/problems/top-k-frequent-elements/description/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 法一：略。
+
+### CODE
+
+```c++
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        int n = nums.size();
+
+        unordered_map<int, int> hash;
+        for (auto it: nums) hash[it] ++; // 记录每个元素出现的次数
+
+        vector<int> numCnt(n + 7, 0);
+        for (auto it: hash) numCnt[it.second] ++; // 记录出现相同次数的，有多少个元素
+
+        int freq = n + 1, cnt = 0; // freq 表示最大的频率， cnt 表示已经有了多少个最大频率
+        while (freq --) { // freq 初始为 n，表示一个元素最多出现 n 次
+            cnt += numCnt[freq]; // 有没有出现次数为 freq 的元素，记录个数
+            if (cnt == k) break; // 已经记录了出现次数第 k 多的元素所对应的频率
+        }
+		
+        vector<int> res;
+        for (auto it: hash) {
+            if (it.second >= freq) res.push_back(it.first); // freq 为答案的最低频率
+        }
+
+        return res;
+    }
+};
+```
+
+
+
+## [295. 数据流的中位数 - 力扣（LeetCode）](https://leetcode.cn/problems/find-median-from-data-stream/?envType=study-plan-v2&envId=top-100-liked)
+
+### 题解
+
+> 
+
+### CODE
+
+```c++
+```
+
+
+
+
+
 # 十四、贪心算法
 
 ## [121. 买卖股票的最佳时机 - 力扣（LeetCode）](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/?envType=study-plan-v2&envId=top-100-liked)
@@ -3303,9 +3393,41 @@ public:
 
 ### 题解
 
+> **法一：**贪心。
+>
+> - 一旦某个字母多次出现了，那么该字母**最后出现位置**必须要在当前子串中。
+> - 用一个 $HashMap$ 来建立字母和其**最后出现位置**之间的映射。
+> - $st$ 代表当前子串的起始位置， $ed$ 代表当前子串的结束位置。
+> - 每遍历到一个字母时，需要在 $HashMap$ 中提取出其**最后出现位置**（一旦当前子串包含了一个字母，其必须包含所有的相同字母），用当前字母的最后一个位置来维护 $ed$ 。
+> - 当 $i==ed$ 时了，说明当前子串包含了所有已出现过的字母的最后一个位置，即找到一个片段。
+
 ### CODE
 
 ```c++
+class Solution {
+public:
+    vector<int> partitionLabels(string s) {
+        int n = s.size();
+        s = " " + s;
+
+        vector<int> res;
+        unordered_map<char, int> hash;
+        
+        for (int i = 1; i <= n; i ++) hash[s[i]] = i;
+
+        int st = 1, ed = 1;
+        for (int i = 1; i <= n; i ++) {
+            ed = max(ed, hash[s[i]]);
+            
+            if (ed == i) {
+                res.push_back(ed - st + 1); 
+                st = i + 1, ed = i + 1;
+            }
+        }
+
+        return res;
+    }
+};
 ```
 
 
